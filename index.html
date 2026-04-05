@@ -437,7 +437,7 @@ textarea.form-control{min-height:100px;resize:vertical;}
       <button class="btn-close-panel" onclick="closeStudentModal()"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <p style="font-size:12px;color:var(--gray);margin-bottom:20px;background:rgba(0,87,168,0.1);border:1px solid rgba(0,87,168,0.2);border-radius:8px;padding:10px 14px;"><i class="fas fa-info-circle" style="margin-right:6px;color:var(--blue3)"></i>Personalize com seus dados. As informações ficam salvas localmente neste navegador.</p>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:20px;background:rgba(0,87,168,0.1);border:1px solid rgba(0,87,168,0.2);border-radius:8px;padding:10px 14px;"><i class="fas fa-info-circle" style="margin-right:6px;color:var(--blue3)"></i>Personalize com seus dados. As informações ficam salvas na nuvem (Firebase) e sincronizadas entre dispositivos.</p>
       <div class="form-row">
         <div class="form-group" style="grid-column:1/-1">
           <label>Nome Completo</label>
@@ -605,8 +605,6 @@ const INITIAL_DATA = {
 };
 
 const INITIAL_STUDENT = {
-  nome:'SOSTHENIS DE LIMA TIMOTEO',
-  matricula:'603644',
   status:'ATIVO',
   programa:'MESTRADO EM ADMINISTRAÇÃO E CONTROLADORIA (PROFISSIONAL)',
   inicio:'MAR/2026',
@@ -769,14 +767,6 @@ function renderStudentCard() {
   const s = studentData;
   const statusClass = s.status==='ATIVO'?'status-ativo':'status-badge';
   document.getElementById('student-card-render').innerHTML = `
-    <div class="student-field full">
-      <label>Nome Completo</label>
-      <value style="font-size:20px;font-family:'Outfit',sans-serif;font-weight:800;">${s.nome||'—'}</value>
-    </div>
-    <div class="student-field">
-      <label>Matrícula / ID</label>
-      <value>${s.matricula||'—'}</value>
-    </div>
     <div class="student-field">
       <label>Status Mestrado</label>
       <value><span class="status-badge ${statusClass}">${s.status||'—'}</span></value>
@@ -979,14 +969,16 @@ function buildPanelBody(d){
       const filesHTML = a.files.length
         ? a.files.map(f=>{
             const fname = typeof f==='object'?f.name:f;
-            const furl = typeof f==='object'?f.url:'';
-            const fkey = getFileKey(d.id, a.id, fname);
+            const furl = typeof f==='object'?f.url:null;
             const icon = fname.endsWith('.pdf')?'fa-file-pdf':fname.endsWith('.docx')||fname.endsWith('.doc')?'fa-file-word':'fa-file';
+            const linkAttr = furl
+              ? `onclick="openFile('${furl}')" style="cursor:pointer;"`
+              : `style="cursor:default;opacity:0.5;" title="Arquivo não sincronizado na nuvem"`;
             return `
           <div class="file-item">
             <div class="file-item-left">
-              <i class="fas ${icon}"></i>
-              <span class="file-link" onclick="openFile('${furl}')">${fname}</span>
+              <i class="fas ${icon}" style="${furl?'':'color:var(--amber)'}"></i>
+              <span class="file-link" ${linkAttr}>${fname}${furl?'':' ⚠️'}</span>
             </div>
             <div class="file-item-right">
               <button class="btn-sm btn-ghost" onclick="removeFile('${d.id}','${a.id}','${fname}')"><i class="fas fa-times"></i></button>
