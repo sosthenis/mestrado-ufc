@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPAC UFC — Mestrado em Administração e Controladoria</title>
+<meta name="description" content="Portal acadêmico do Mestrado Profissional em Administração e Controladoria da UFC — PPAC. Gestão de disciplinas, materiais e progresso acadêmico.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<style>
+:root{
+  --navy:#071526;--navy2:#0d1e35;--navy3:#132845;
+  --blue:#0057A8;--blue2:#0069cc;--blue3:#1a82e8;
+  --gold:#c9962a;--gold2:#e8b444;--gold3:#f5d080;
+  --green:#10B981;--red:#EF4444;--amber:#F59E0B;
+  --white:#f0f6ff;--gray:#94aac2;--gray2:#456080;
+  --card:rgba(13,30,53,0.85);--border:rgba(0,87,168,0.25);
+  --radius:14px;--radius2:10px;
+  --shadow:0 8px 32px rgba(0,0,0,0.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--white);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(0,87,168,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 100%,rgba(201,150,42,0.10) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--navy2);}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px;}
+/* FOCUS VISIBLE */
+:focus-visible{outline:2px solid var(--blue3);outline-offset:3px;border-radius:4px;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(7,21,38,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;}
+.nav-inner{max-width:1280px;margin:auto;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.logo-box{display:flex;align-items:center;gap:15px;}
+.logo-ufc{width:40px;height:40px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;color:#fff;}
+.logo-box h1{font-size:18px;margin:0;line-height:1.2;font-weight:700;letter-spacing:-0.4px;color:var(--white);}
+    .cloud-sync-tag{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--green);font-size:10px;padding:2px 10px;border-radius:12px;font-weight:600;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+    .cloud-sync-tag.offline{background:rgba(217,119,6,0.15);border:1px solid rgba(217,119,6,0.3);color:#fbbf24;}
+    .cloud-sync-tag.syncing i{animation:spin 2s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.nav-links{display:flex;gap:6px;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;padding:6px 14px;border-radius:8px;transition:.2s;}
+.nav-links a:hover{background:rgba(0,87,168,0.2);color:var(--white);}
+.btn-upload-nav{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff!important;border-radius:8px!important;}
+
+/* HERO */
+.hero{position:relative;padding:80px 2rem 60px;text-align:center;overflow:hidden;}
+.hero-bg-rings{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.hero-bg-rings::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:700px;border-radius:50%;border:1px solid rgba(0,87,168,0.15);animation:ringPulse 4s ease-in-out infinite;}
+.hero-bg-rings::after{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:500px;border-radius:50%;border:1px solid rgba(201,150,42,0.1);animation:ringPulse 4s ease-in-out infinite 1s;}
+@keyframes ringPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:.6;}50%{transform:translateX(-50%) scale(1.04);opacity:1;}}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,87,168,0.15);border:1px solid rgba(0,87,168,0.4);border-radius:50px;padding:6px 18px;font-size:12px;color:var(--blue3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;}
+.hero h1{font-family:'Outfit',sans-serif;font-size:clamp(28px,5vw,52px);font-weight:800;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,var(--white) 0%,var(--blue3) 50%,var(--gold2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:16px;color:var(--gray);max-width:600px;margin:0 auto 40px;line-height:1.7;}
+.hero-stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:40px;}
+.hero-stat{text-align:center;}
+.hero-stat-val{font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--blue3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-stat-label{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+
+/* MESTRADO CARD */
+.section{padding:40px 2rem;max-width:1280px;margin:auto;}
+.section-title{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+.section-title i{color:var(--blue3);font-size:18px;}
+.section-title .badge-count{background:var(--blue);color:#fff;border-radius:50px;padding:2px 10px;font-size:12px;font-family:'Inter',sans-serif;font-weight:600;}
+
+.mestrado-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;position:relative;overflow:hidden;backdrop-filter:blur(12px);}
+.mestrado-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold2),var(--blue3));}
+.mestrado-field label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gray);margin-bottom:4px;display:block;}
+.mestrado-field value{font-size:15px;font-weight:600;color:var(--white);}
+.mestrado-field.full{grid-column:1/-1;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:50px;font-size:12px;font-weight:600;}
+.status-ativo{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.3);}
+.status-ativo::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* PROGRESS */
+.progress-block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:12px;backdrop-filter:blur(12px);}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.progress-header h3{font-size:14px;font-weight:600;color:var(--gray);}
+.progress-header span{font-size:13px;color:var(--blue3);font-weight:700;}
+.progress-bar{height:8px;background:rgba(255,255,255,0.07);border-radius:50px;overflow:hidden;margin-bottom:8px;}
+.progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--blue),var(--blue3));transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.progress-fill.gold{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--gray);}
+
+/* TIMELINE */
+.timeline-bar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;backdrop-filter:blur(12px);}
+.timeline-track{display:flex;gap:0;margin-top:20px;position:relative;}
+.timeline-track::before{content:'';position:absolute;top:20px;left:0;right:0;height:2px;background:rgba(255,255,255,0.07);}
+.timeline-step{flex:1;text-align:center;position:relative;}
+.timeline-dot{width:14px;height:14px;border-radius:50%;background:var(--navy2);border:2px solid var(--gray2);margin:14px auto 8px;position:relative;z-index:1;transition:.3s;}
+.timeline-dot.active{background:var(--blue);border-color:var(--blue3);box-shadow:0 0 12px rgba(26,130,232,0.5);}
+.timeline-dot.done{background:var(--green);border-color:var(--green);}
+.timeline-label{font-size:10px;color:var(--gray);letter-spacing:.5px;}
+.timeline-label strong{display:block;font-size:11px;color:var(--white);font-weight:600;}
+
+/* GRID CARDS */
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+.disc-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.3s;cursor:pointer;backdrop-filter:blur(12px);}
+.disc-card:hover{border-color:rgba(0,87,168,0.6);transform:translateY(-3px);box-shadow:var(--shadow);}
+.disc-card-header{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:flex-start;}
+.disc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.disc-icon.blue{background:rgba(0,87,168,0.2);}
+.disc-icon.gold{background:rgba(201,150,42,0.2);}
+.disc-icon.green{background:rgba(16,185,129,0.15);}
+.disc-icon.purple{background:rgba(139,92,246,0.15);}
+.disc-icon.red{background:rgba(239,68,68,0.15);}
+.disc-card-body{padding:16px 20px 20px;}
+.disc-card h3{font-size:15px;font-weight:700;margin-bottom:4px;line-height:1.3;}
+.disc-card-code{font-size:11px;color:var(--gray);letter-spacing:1px;margin-bottom:12px;}
+.disc-card-meta{display:flex;gap:12px;font-size:12px;color:var(--gray);margin-bottom:14px;}
+.disc-card-meta span{display:flex;align-items:center;gap:4px;}
+.disc-status{font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;}
+.s-mat{background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);}
+.s-pend{background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.25);}
+.s-conc{background:rgba(0,87,168,0.12);color:var(--blue3);border:1px solid rgba(0,87,168,0.25);}
+.disc-card-actions{display:flex;gap:8px;padding:0 20px 16px;}
+.btn-sm{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;}
+.btn-primary:hover{filter:brightness(1.15);}
+.btn-ghost{background:rgba(255,255,255,0.05);color:var(--gray);border:1px solid rgba(255,255,255,0.1);}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);color:var(--white);}
+.btn-danger-sm{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);}
+.btn-danger-sm:hover{background:rgba(239,68,68,0.2);}
+
+/* DISCIPLINE DETAIL PANEL */
+.disc-panel{display:none;background:rgba(7,21,38,0.97);border:1px solid var(--border);border-radius:var(--radius);position:fixed;inset:0;z-index:200;overflow-y:auto;padding:0;animation:slideIn .3s ease;}
+.disc-panel.open{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.panel-header{position:sticky;top:0;background:rgba(7,21,38,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;z-index:10;}
+.panel-header h2{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;}
+.panel-body{max-width:900px;margin:0 auto;padding:32px 24px;}
+.btn-close-panel{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--gray);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.btn-close-panel:hover{background:rgba(239,68,68,0.2);color:var(--red);border-color:var(--red);}
+
+/* AULA ACCORDION */
+.ementa-box{background:rgba(0,87,168,0.08);border:1px solid rgba(0,87,168,0.2);border-radius:var(--radius2);padding:20px;margin-bottom:24px;font-size:14px;line-height:1.8;color:#c5d8f0;}
+.aulas-section h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.aula-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;overflow:hidden;transition:.2s;}
+.aula-item:hover{border-color:rgba(0,87,168,0.4);}
+.aula-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.aula-header-left{display:flex;align-items:center;gap:12px;}
+.aula-num{width:28px;height:28px;border-radius:8px;background:rgba(0,87,168,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue3);flex-shrink:0;}
+.aula-title{font-size:14px;font-weight:600;}
+.aula-chevron{color:var(--gray);transition:.2s;}
+.aula-item.expanded .aula-chevron{transform:rotate(90deg);}
+.aula-body{display:none;padding:0 18px 18px;}
+.aula-item.expanded .aula-body{display:block;}
+.file-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.file-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:8px 12px;}
+.file-item-left{display:flex;align-items:center;gap:10px;font-size:13px;}
+.file-item-left i{color:var(--blue3);}
+.file-item-right{display:flex;gap:6px;}
+.file-link{color:var(--blue3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;transition:.15s;}
+.file-link:hover{color:var(--white);}
+.upload-zone{border:2px dashed rgba(0,87,168,0.4);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:.2s;position:relative;}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--blue3);background:rgba(0,87,168,0.08);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-zone p{font-size:12px;color:var(--gray);margin-top:6px;}
+.upload-zone i{color:var(--blue);font-size:20px;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius);width:90%;max-width:560px;max-height:90vh;overflow-y:auto;animation:slideIn .25s ease;}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;}
+.modal-body{padding:24px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.form-control{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
+.form-control:focus{border-color:var(--blue3);background:rgba(0,87,168,0.08);}
+.form-control::placeholder{color:var(--gray2);}
+textarea.form-control{min-height:100px;resize:vertical;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.btn-full{width:100%;padding:12px;border-radius:10px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;}
+.btn-lg{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.2s;}
+.btn-lg:hover{filter:brightness(1.1);}
+.btn-cancel{background:rgba(255,255,255,0.05);color:var(--gray);padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:.2s;}
+.btn-cancel:hover{background:rgba(255,255,255,0.1);}
+
+/* FAB */
+.fab{position:fixed;bottom:32px;right:32px;z-index:90;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--gold));border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 6px 30px rgba(0,87,168,0.5);transition:.3s;display:flex;align-items:center;justify-content:center;}
+.fab:hover{transform:scale(1.1) rotate(45deg);box-shadow:0 10px 40px rgba(0,87,168,0.7);}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;}
+.tab-btn{padding:8px 20px;border-radius:8px;border:none;background:transparent;color:var(--gray);font-size:13px;font-weight:600;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;}
+.tab-btn.active{background:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(0,87,168,0.4);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* PENDING */
+.pending-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.pending-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:18px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(8px);}
+.pending-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+.pending-info{flex:1;}
+.pending-info h4{font-size:13px;font-weight:700;margin-bottom:2px;}
+.pending-info p{font-size:11px;color:var(--gray);}
+
+/* NOTIFICATIONS */
+.toast{position:fixed;bottom:100px;right:32px;z-index:500;background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:13px;box-shadow:var(--shadow);animation:slideIn .3s ease;display:flex;align-items:center;gap:10px;max-width:300px;}
+.toast.success{border-color:rgba(16,185,129,0.4);color:var(--green);}
+.toast.error{border-color:rgba(239,68,68,0.4);color:var(--red);}
+
+/* EDIT MESTRADO BUTTON */
+.btn-edit-mestrado,.btn-edit-student{background:rgba(0,87,168,0.15);border:1px solid rgba(0,87,168,0.35);color:var(--blue3);border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s;font-family:'Inter',sans-serif;}
+.btn-edit-mestrado:hover,.btn-edit-student:hover{background:rgba(0,87,168,0.3);}
+.mestrado-field input.inline-edit,.mestrado-field select.inline-edit{background:rgba(255,255,255,0.06);border:1px solid rgba(0,87,168,0.4);border-radius:6px;padding:5px 10px;color:var(--white);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;width:100%;outline:none;}
+.mestrado-field input.inline-edit:focus,.mestrado-field select.inline-edit:focus{border-color:var(--blue3);}
+/* STUDENT CARD GRID */
+.student-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;position:relative;overflow:hidden;backdrop-filter:blur(12px);}
+.student-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--gold2),var(--blue3));}
+.student-field{min-width:0;}
+.student-field.full{grid-column:1/-1;}
+.student-field label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gray);margin-bottom:4px;display:block;}
+.student-field value{font-size:15px;font-weight:600;color:var(--white);display:block;}
+@media(max-width:768px){.student-card{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.student-card{grid-template-columns:1fr;}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray);}
+.empty-state i{font-size:48px;margin-bottom:16px;opacity:.4;}
+.empty-state p{font-size:14px;max-width:250px;margin:0 auto;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .mestrado-card{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+  .hero-stats{gap:1.5rem;}
+  .grid3{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .fab{bottom:24px;right:24px;}
+}
+@media(max-width:480px){
+  .mestrado-card{grid-template-columns:1fr;}
+}
+
+/* SEPARATOR */
+.sep{height:1px;background:var(--border);margin:8px 0 32px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo-box">
+      <div class="logo-ufc">UFC</div>
+      <h1>PPAC — Mestrado Profissional<br><span style="font-weight:400;color:var(--gray);text-transform:uppercase;font-size:11px;">Administração e Controladoria</span></h1>
+      <div id="cloud-status" class="cloud-sync-tag"><i class="fas fa-cloud"></i> NUVEM ATIVA</div>
+    </div>
+    <div class="nav-links">
+      <a href="#perfil">Perfil</a>
+      <a href="#progresso">Progresso</a>
+      <a href="#disciplinas">Disciplinas</a>
+      <a href="#" class="btn-upload-nav" onclick="openModal()"><i class="fas fa-plus"></i> Nova Disciplina</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-rings"></div>
+  <div class="hero-badge"><i class="fas fa-graduation-cap"></i> MESTRADO ATIVO • 2026–2028</div>
+  <h1>Mestrado em Administração<br>e Controladoria Profissional</h1>
+  <p class="hero-sub">Portal acadêmico do PPAC · UFC/FEAAC — Gerencie disciplinas, materiais e acompanhe seu progresso no programa.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-val">3</div><div class="hero-stat-label">Disciplinas Ativas</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">0%</div><div class="hero-stat-label">C.H. Integralizada</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">30</div><div class="hero-stat-label">Créditos Exigidos</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">FEV/28</div><div class="hero-stat-label">Prazo Final</div></div>
+  </div>
+</section>
+
+<!-- PERFIL -->
+<div id="perfil" class="section">
+  <div class="section-title" style="justify-content:space-between;">
+    <span><i class="fas fa-graduation-cap"></i> Dados do Mestrado</span>
+    <button class="btn-edit-student" onclick="openStudentModal()"><i class="fas fa-pen"></i> Editar Perfil</button>
+  </div>
+  <div class="student-card" id="student-card-render"></div>
+</div>
+
+<!-- PROGRESSO -->
+<div id="progresso" class="section">
+  <div class="section-title"><i class="fas fa-chart-line"></i> Progresso Acadêmico</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="progress-block">
+      <div class="progress-header"><h3><i class="fas fa-clock" style="margin-right:6px;color:var(--blue3)"></i>Carga Horária</h3><span>0 / 480h</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      <div class="progress-meta"><span>0% integralizado</span><span>480h pendente</span></div>
+    </div>
+    <div class="progress-block">
+      <div class="progress-header"><h3><i class="fas fa-star" style="margin-right:6px;color:var(--gold2)"></i>Créditos</h3><span>0 / 30</span></div>
+      <div class="progress-bar"><div class="progress-fill gold" style="width:0%"></div></div>
+      <div class="progress-meta"><span>0% integralizado</span><span>30 pendentes</span></div>
+    </div>
+  </div>
+  <div class="timeline-bar">
+    <div class="section-title" style="margin-bottom:0;font-size:16px;"><i class="fas fa-map-signs"></i> Linha do Tempo</div>
+    <div class="timeline-track">
+      <div class="timeline-step"><div class="timeline-dot done"></div><div class="timeline-label"><strong>Ingresso</strong>MAR/2026</div></div>
+      <div class="timeline-step"><div class="timeline-dot active"></div><div class="timeline-label"><strong>Disciplinas</strong>2026</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Proficiência</strong>2026</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Qualificação</strong>2027</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Dissertação</strong>2027/28</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Defesa</strong>FEV/2028</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCIPLINAS -->
+<div id="disciplinas" class="section">
+  <div class="section-title">
+    <i class="fas fa-book-open"></i> Disciplinas
+    <span class="badge-count" id="disc-count">6</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('todas',this)">Todas</button>
+    <button class="tab-btn" onclick="switchTab('matriculado',this)">Matriculadas</button>
+    <button class="tab-btn" onclick="switchTab('pendente',this)">Pendentes</button>
+  </div>
+
+  <div id="tab-todas" class="tab-content active">
+    <div class="grid3" id="cards-container"></div>
+  </div>
+  <div id="tab-matriculado" class="tab-content">
+    <div class="grid3" id="cards-mat"></div>
+  </div>
+  <div id="tab-pendente" class="tab-content">
+    <div style="margin-bottom:20px;font-size:13px;color:var(--gray);">Componentes obrigatórios ainda não cursados:</div>
+    <div class="pending-grid" id="pending-grid"></div>
+  </div>
+</div>
+
+<!-- DISCIPLINE DETAIL PANEL -->
+<div class="disc-panel" id="disc-panel">
+  <div class="panel-header">
+    <h2 id="panel-title">—</h2>
+    <button class="btn-close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</div>
+
+<!-- MODAL NOVA DISCIPLINA -->
+<div class="modal-overlay" id="modal-disc" role="dialog" aria-modal="true" aria-labelledby="modal-disc-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-disc-title"><i class="fas fa-plus-circle" style="color:var(--blue3);margin-right:8px"></i>Nova Disciplina</h3>
+      <button class="btn-close-panel" onclick="closeModal()" aria-label="Fechar"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Código</label>
+          <input class="form-control" id="f-codigo" placeholder="ex: EDP706A">
+        </div>
+        <div class="form-group">
+          <label>Créditos</label>
+          <input class="form-control" id="f-creditos" type="number" placeholder="3" min="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nome da Disciplina</label>
+        <input class="form-control" id="f-nome" placeholder="ex: FINANÇAS CORPORATIVAS">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Carga Horária (h)</label>
+          <input class="form-control" id="f-ch" type="number" placeholder="48">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="f-status">
+            <option value="matriculado">Matriculado</option>
+            <option value="pendente">Pendente</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ementa</label>
+        <textarea class="form-control" id="f-ementa" placeholder="Descreva os tópicos da disciplina..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Número de Aulas</label>
+        <input class="form-control" id="f-aulas" type="number" placeholder="12" min="1">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-lg" onclick="saveDiscipline()"><i class="fas fa-save" style="margin-right:6px"></i>Salvar Disciplina</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADICIONAR AULA -->
+<div class="modal-overlay" id="modal-aula" role="dialog" aria-modal="true" aria-labelledby="modal-aula-title">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 id="modal-aula-title"><i class="fas fa-chalkboard-teacher" style="color:var(--blue3);margin-right:8px"></i>Nova Aula</h3>
+      <button class="btn-close-panel" onclick="closeAulaModal()" aria-label="Fechar"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="aula-disc-id">
+      <div class="form-group">
+        <label>Título da Aula</label>
+        <input class="form-control" id="aula-titulo" placeholder="ex: Teorias Contemporâneas" autofocus>
+      </div>
+      <div class="form-group">
+        <label>Número / Identificador</label>
+        <input class="form-control" id="aula-num-custom" placeholder="ex: 12 ou EXTRA 2 (opcional)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAulaModal()">Cancelar</button>
+      <button class="btn-lg" onclick="saveAula()"><i class="fas fa-plus" style="margin-right:6px"></i>Adicionar Aula</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR ALUNO -->
+<div class="modal-overlay" id="modal-student">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-edit" style="color:var(--gold2);margin-right:8px"></i>Editar Dados do Mestrado</h3>
+      <button class="btn-close-panel" onclick="closeStudentModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--gray);margin-bottom:20px;background:rgba(0,87,168,0.1);border:1px solid rgba(0,87,168,0.2);border-radius:8px;padding:10px 14px;"><i class="fas fa-info-circle" style="margin-right:6px;color:var(--blue3)"></i>Personalize com seus dados. As informações ficam salvas localmente neste navegador.</p>
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Nome Completo</label>
+          <input class="form-control" id="s-nome" placeholder="SEU NOME COMPLETO">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Matrícula</label>
+          <input class="form-control" id="s-matricula" placeholder="ex: 603644">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="s-status">
+            <option value="ATIVO">ATIVO</option>
+            <option value="INATIVO">INATIVO</option>
+            <option value="CONCLUÍDO">CONCLUÍDO</option>
+            <option value="TRANCADO">TRANCADO</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Programa</label>
+        <input class="form-control" id="s-programa" placeholder="MESTRADO EM ADMINISTRAÇÃO E CONTROLADORIA (PROFISSIONAL)">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Início do Curso</label>
+          <input class="form-control" id="s-inicio" placeholder="MAR/2026">
+        </div>
+        <div class="form-group">
+          <label>Prazo Final</label>
+          <input class="form-control" id="s-prazo" placeholder="FEV/2028">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Área de Concentração</label>
+          <input class="form-control" id="s-area" placeholder="Gestão Organizacional">
+        </div>
+        <div class="form-group">
+          <label>Linha de Pesquisa</label>
+          <input class="form-control" id="s-linha" placeholder="Estratégias e Sustentabilidade">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Currículo</label>
+          <input class="form-control" id="s-curriculo" placeholder="2022.1">
+        </div>
+        <div class="form-group">
+          <label>Mês Atual do Curso</label>
+          <input class="form-control" id="s-mes" placeholder="ex: 2º Mês">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Instituição</label>
+          <input class="form-control" id="s-instituicao" placeholder="UFC / FEAAC — Fortaleza, CE">
+        </div>
+        <div class="form-group">
+          <label>Forma de Ingresso</label>
+          <input class="form-control" id="s-ingresso" placeholder="Seleção">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Orientador</label>
+          <input class="form-control" id="s-orientador" placeholder="Nome do orientador">
+        </div>
+        <div class="form-group">
+          <label>Link SIGAA / Sistema</label>
+          <input class="form-control" id="s-sigaa" placeholder="http://si3.ufc.br/sigaa">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeStudentModal()">Cancelar</button>
+      <button class="btn-lg" onclick="saveStudentData()"><i class="fas fa-save" style="margin-right:6px"></i>Salvar Dados</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openModal()" title="Adicionar disciplina"><i class="fas fa-plus"></i></button>
+
+<script>
+// ========================
+// DATA LAYER
+// ========================
+const INITIAL_DATA = {
+  disciplines: [
+    {
+      id:'edp704a', code:'EDP704A', name:'TEORIA DAS ORGANIZAÇÕES',
+      credits:3, ch:48, status:'matriculado', color:'blue', icon:'fa-sitemap',
+      ementa:'Crise e transformação das organizações. Relação do pensamento teórico-organizacional com a prática da gestão. Racionalidade organizacional. Paradoxos organizacionais. Inovação nas organizações. Teorias Clássicas da Administração. Abordagem Humanista. Teorias contemporâneas. Poder e conflito nas organizações.',
+      aulas:[
+        {id:1, title:'Apresentação do Programa', files:['0. Apresenta Da disciplina Teo_Organ.pdf','1. Cronograma TO.pdf','2. Programa TO.pdf']},
+        {id:2, title:'Os Fundamentos da Administração', files:['Texto fundamentos.pdf']},
+        {id:3, title:'A Abordagem Humanista', files:['3. Modelo Resenha - A perspectiva humanista.pdf']},
+        {id:4, title:'Teorias Clássicas', files:[]},
+        {id:5, title:'Racionalidade Organizacional', files:[]},
+        {id:6, title:'Paradoxos Organizacionais', files:[]},
+        {id:7, title:'Poder e Conflito', files:[]},
+        {id:8, title:'Inovação nas Organizações', files:[]},
+        {id:9, title:'Crise e Transformação', files:[]},
+        {id:10, title:'Teorias Contemporâneas I', files:[]},
+        {id:11, title:'Teorias Contemporâneas II', files:[]},
+        {id:'extra1', title:'Aula EXTRA: Quadro de Congruência dos Artigos (Aula Conjunta TO:Metodologia)', files:['Quadro Congruencia Artigos v1.pdf']},
+      ]
+    },
+    {
+      id:'edp705a', code:'EDP705A', name:'METODOLOGIA DE PESQUISA',
+      credits:3, ch:48, status:'matriculado', color:'gold', icon:'fa-flask',
+      ementa:'Natureza da ciência e da pesquisa. Visão geral dos principais tipos, métodos e técnicas de pesquisa. Projeto de pesquisa. Pesquisa qualitativa: conceitos, tipos e aplicações. Pesquisa quantitativa: conceitos, tipos e aplicações. Técnicas de coleta e análise de dados. Amostragem. Normas ABNT. Processo de orientação.',
+      aulas:[
+        {id:1, title:'Introdução à Metodologia Científica', files:[]},
+        {id:2, title:'Tipos e Métodos de Pesquisa', files:[]},
+        {id:3, title:'Projeto de Pesquisa', files:[]},
+        {id:4, title:'Pesquisa Qualitativa', files:[]},
+        {id:5, title:'Pesquisa Quantitativa', files:[]},
+        {id:6, title:'Coleta e Análise de Dados', files:[]},
+        {id:7, title:'Amostragem', files:[]},
+        {id:8, title:'Normas ABNT', files:[]},
+        {id:9, title:'Relatórios Científicos', files:[]},
+        {id:10, title:'Processo de Orientação', files:[]},
+      ]
+    },
+    {
+      id:'ehp713a', code:'EHP713A', name:'CONTROLADORIA',
+      credits:3, ch:48, status:'matriculado', color:'green', icon:'fa-chart-bar',
+      ementa:'Fundamentos e evolução da Controladoria. A controladoria como função organizacional. Planejamento e controle; orçamento empresarial. Sistemas de informações gerenciais. Contabilidade gerencial e por responsabilidade. Gestão de custos e de desempenho. Papéis e competências do controller.',
+      aulas:[
+        {id:1, title:'Fundamentos da Controladoria', files:['Ementa - controladoria-atualizado.pdf']},
+        {id:2, title:'Controladoria como Função Organizacional', files:[]},
+        {id:3, title:'Planejamento e Controle', files:[]},
+        {id:4, title:'Orçamento Empresarial', files:[]},
+        {id:5, title:'Sistemas de Informação Gerencial', files:[]},
+        {id:6, title:'Contabilidade Gerencial', files:[]},
+        {id:7, title:'Gestão de Custos', files:[]},
+        {id:8, title:'Gestão de Desempenho', files:[]},
+        {id:9, title:'Papéis do Controller', files:[]},
+        {id:10, title:'Tendências e Indústria 4.0', files:[]},
+      ]
+    },
+    {
+      id:'ehp0108', code:'EHP0108', name:'PROFICIÊNCIA',
+      credits:0, ch:16, status:'pendente', color:'purple', icon:'fa-language',
+      ementa:'Exame de proficiência em língua estrangeira (Inglês ou outra aprovada pelo programa). Requisito obrigatório para integralização.',
+      aulas:[]
+    },
+    {
+      id:'ehp0049', code:'EHP0049', name:'QUALIFICAÇÃO',
+      credits:0, ch:16, status:'pendente', color:'red', icon:'fa-file-alt',
+      ementa:'Apresentação e defesa do projeto de dissertação perante banca examinadora. Exame de qualificação obrigatório para aprovação e prosseguimento à dissertação.',
+      aulas:[]
+    },
+    {
+      id:'edp799a', code:'EDP799A', name:'DISSERTAÇÃO',
+      credits:0, ch:96, status:'pendente', color:'gold', icon:'fa-scroll',
+      ementa:'Elaboração, redação e defesa pública da dissertação de mestrado, sob orientação de docente credenciado no Programa. Resultado de pesquisa original na área de Administração e Controladoria.',
+      aulas:[]
+    }
+  ]
+};
+
+const INITIAL_STUDENT = {
+  nome:'SOSTHENIS DE LIMA TIMOTEO',
+  matricula:'603644',
+  status:'ATIVO',
+  programa:'MESTRADO EM ADMINISTRAÇÃO E CONTROLADORIA (PROFISSIONAL)',
+  inicio:'MAR/2026',
+  prazo:'FEV/2028',
+  area:'Gestão Organizacional',
+  linha:'Estratégias e Sustentabilidade',
+  curriculo:'2022.1',
+  mes:'2º Mês',
+  ingresso:'Seleção',
+  instituicao:'UFC / FEAAC — Fortaleza, CE',
+  orientador:'—',
+  sigaa:'http://si3.ufc.br/sigaa'
+};
+
+// ========================
+// FIREBASE CONFIG
+// ========================
+const firebaseConfig = {
+  projectId: "mestrado-ppac",
+  appId: "1:850386937509:web:5b0e6b10f6ed07f2b34f4c",
+  storageBucket: "mestrado-ppac.firebasestorage.app",
+  apiKey: "AIzaSyDF-h7RURwAzAz9-sWGxZWgAMboAdqEp1c",
+  authDomain: "mestrado-ppac.firebaseapp.com",
+  messagingSenderId: "850386937509",
+  measurementId: "G-K3G4D9HKK9"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+const auth = firebase.auth();
+
+let appData = null;
+let studentData = null;
+let currentUId = null;
+let isOffline = false;
+
+// ========================
+// DATA PERSISTENCE (CLOUD + FALLBACK)
+// ========================
+function getDocId(){ return currentUId || 'local'; }
+
+async function initAuth(){
+  return new Promise(resolve=>{
+    const timeout = setTimeout(()=>{
+      console.warn("Firebase Timeout - Falling back to local storage.");
+      isOffline = true;
+      currentUId = 'local';
+      resolve(null);
+    }, 5000);
+
+    auth.onAuthStateChanged(user=>{
+      clearTimeout(timeout);
+      if(user){ 
+        currentUId = user.uid; 
+        isOffline = false;
+        resolve(user); 
+      } else { 
+        auth.signInAnonymously()
+          .then(cred=>{ 
+            currentUId = cred.user.uid; 
+            isOffline = false;
+            resolve(cred.user); 
+          })
+          .catch(e=>{
+            console.error("Auth Fail:", e);
+            isOffline = true;
+            currentUId = 'local';
+            resolve(null);
+          });
+      }
+    });
+  });
+}
+
+function getLocal(key, def){
+  const s = localStorage.getItem(key);
+  return s ? JSON.parse(s) : def;
+}
+
+async function loadData() {
+  if(isOffline){
+    appData = getLocal('ppac_cloud_app', JSON.parse(JSON.stringify(INITIAL_DATA)));
+    return;
+  }
+  try {
+    const doc = await db.collection('users').doc(getDocId()).get();
+    if (doc.exists && doc.data().disciplines) {
+      appData = doc.data();
+    } else {
+      appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+      await db.collection('users').doc(getDocId()).set(appData);
+    }
+  } catch(e) { 
+    isOffline = true; 
+    appData = getLocal('ppac_cloud_app', JSON.parse(JSON.stringify(INITIAL_DATA)));
+  }
+}
+
+async function loadStudent() {
+  if(isOffline){
+    studentData = getLocal('ppac_cloud_profile', {...INITIAL_STUDENT});
+    return;
+  }
+  try {
+    const doc = await db.collection('users').doc(getDocId()+'_profile').get();
+    if (doc.exists) {
+      studentData = doc.data();
+    } else {
+      studentData = {...INITIAL_STUDENT};
+      await db.collection('users').doc(getDocId()+'_profile').set(studentData);
+    }
+  } catch(e) {
+    studentData = getLocal('ppac_cloud_profile', {...INITIAL_STUDENT});
+  }
+}
+
+async function saveData() {
+  showSyncing(true);
+  if(!isOffline){
+    try { await db.collection('users').doc(getDocId()).set(appData); }
+    catch(e) { console.error("Cloud Save Fail:", e); }
+  }
+  localStorage.setItem('ppac_cloud_app', JSON.stringify(appData));
+  showSyncing(false);
+}
+
+async function saveStudent(s) {
+  showSyncing(true);
+  if(!isOffline){
+    try { await db.collection('users').doc(getDocId()+'_profile').set(s); }
+    catch(e) { console.error("Cloud Profile Fail:", e); }
+  }
+  localStorage.setItem('ppac_cloud_profile', JSON.stringify(s));
+  showSyncing(false);
+}
+
+function showSyncing(active){
+  const tag = document.getElementById('cloud-status');
+  if(active){
+    tag.innerHTML = '<i class="fas fa-sync-alt"></i> SINCRONIZANDO...';
+    tag.classList.add('syncing');
+    tag.classList.remove('offline');
+  } else {
+    if(isOffline){
+      tag.innerHTML = '<i class="fas fa-wifi-slash"></i> MODO LOCAL (OFFLINE)';
+      tag.classList.add('offline');
+      tag.classList.remove('syncing');
+    } else {
+      tag.innerHTML = '<i class="fas fa-cloud"></i> NUVEM ATIVA';
+      tag.classList.remove('syncing', 'offline');
+    }
+  }
+}
+
+// ========================
+// RENDER DADOS MESTRADO
+// ========================
+function renderStudentCard() {
+  if(!studentData) return;
+  const s = studentData;
+  const statusClass = s.status==='ATIVO'?'status-ativo':'status-badge';
+  document.getElementById('student-card-render').innerHTML = `
+    <div class="student-field full">
+      <label>Nome Completo</label>
+      <value style="font-size:20px;font-family:'Outfit',sans-serif;font-weight:800;">${s.nome||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Matrícula / ID</label>
+      <value>${s.matricula||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Status Mestrado</label>
+      <value><span class="status-badge ${statusClass}">${s.status||'—'}</span></value>
+    </div>
+    <div class="student-field">
+      <label>Tempo de Curso</label>
+      <value>${s.mes||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Programa PPAC</label>
+      <value>${s.programa||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Ciclo / Prazo Final</label>
+      <value>${s.inicio||'—'} → ${s.prazo||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Matriz Curricular</label>
+      <value>${s.curriculo||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Área de Atuação</label>
+      <value>${s.area||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Linha Estratégica</label>
+      <value>${s.linha||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Via de Ingresso</label>
+      <value>${s.ingresso||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Orientação</label>
+      <value>${s.orientador||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Instituição</label>
+      <value>${s.instituicao||'—'}</value>
+    </div>
+    <div class="student-field">
+      <label>Portal SIGAA</label>
+      <value><a href="${s.sigaa||'#'}" target="_blank" style="color:var(--blue3);text-decoration:none;">${(s.sigaa||'').replace('http://','').replace('https://','') || '—'} ↗</a></value>
+    </div>`;
+}
+
+// ... rest of student modal functions unchanged ...
+function openStudentModal(){
+  const s = studentData;
+  document.getElementById('s-nome').value = s.nome||'';
+  document.getElementById('s-matricula').value = s.matricula||'';
+  document.getElementById('s-status').value = s.status||'ATIVO';
+  document.getElementById('s-programa').value = s.programa||'';
+  document.getElementById('s-inicio').value = s.inicio||'';
+  document.getElementById('s-prazo').value = s.prazo||'';
+  document.getElementById('s-area').value = s.area||'';
+  document.getElementById('s-linha').value = s.linha||'';
+  document.getElementById('s-curriculo').value = s.curriculo||'';
+  document.getElementById('s-mes').value = s.mes||'';
+  document.getElementById('s-ingresso').value = s.ingresso||'';
+  document.getElementById('s-instituicao').value = s.instituicao||'';
+  document.getElementById('s-orientador').value = s.orientador||'';
+  document.getElementById('s-sigaa').value = s.sigaa||'';
+  document.getElementById('modal-student').classList.add('open');
+}
+function closeStudentModal(){
+  document.getElementById('modal-student').classList.remove('open');
+}
+async function saveStudentData(){
+  studentData = {
+    nome: document.getElementById('s-nome').value.trim().toUpperCase()||studentData.nome,
+    matricula: document.getElementById('s-matricula').value.trim(),
+    status: document.getElementById('s-status').value,
+    programa: document.getElementById('s-programa').value.trim(),
+    inicio: document.getElementById('s-inicio').value.trim(),
+    prazo: document.getElementById('s-prazo').value.trim(),
+    area: document.getElementById('s-area').value.trim(),
+    linha: document.getElementById('s-linha').value.trim(),
+    curriculo: document.getElementById('s-curriculo').value.trim(),
+    mes: document.getElementById('s-mes').value.trim(),
+    ingresso: document.getElementById('s-ingresso').value.trim(),
+    instituicao: document.getElementById('s-instituicao').value.trim(),
+    orientador: document.getElementById('s-orientador').value.trim(),
+    sigaa: document.getElementById('s-sigaa').value.trim()
+  };
+  await saveStudent(studentData);
+  renderStudentCard();
+  closeStudentModal();
+  showToast('success','Dados na nuvem atualizados!');
+}
+
+// ========================
+// RENDER CARDS
+// ========================
+function getBadgeClass(status){
+  if(status==='matriculado') return 's-mat';
+  if(status==='concluido') return 's-conc';
+  return 's-pend';
+}
+function getStatusLabel(status){
+  if(status==='matriculado') return 'Matriculado';
+  if(status==='concluido') return 'Concluído';
+  return 'Pendente';
+}
+function renderCards(){
+  const allContainer = document.getElementById('cards-container');
+  const matContainer = document.getElementById('cards-mat');
+  const pendingGrid = document.getElementById('pending-grid');
+  allContainer.innerHTML=''; matContainer.innerHTML=''; pendingGrid.innerHTML='';
+
+  const all = appData.disciplines;
+  document.getElementById('disc-count').textContent= all.length;
+
+  all.forEach(d=> {
+    const card = buildCard(d);
+    allContainer.appendChild(card.cloneNode(true));
+    if(d.status==='matriculado') matContainer.appendChild(card.cloneNode(true));
+    if(d.status==='pendente') {
+      pendingGrid.appendChild(buildPendingItem(d));
+    }
+  });
+
+  // re-attach card listeners
+  document.querySelectorAll('.disc-card').forEach(c=>{
+    c.addEventListener('click', e=>{
+      if(e.target.closest('.disc-card-actions')) return;
+      const id = c.dataset.id;
+      openPanel(id);
+    });
+  });
+  document.querySelectorAll('.btn-delete-disc').forEach(b=>{
+    b.addEventListener('click', e=>{
+      e.stopPropagation();
+      deleteDisc(b.dataset.id);
+    });
+  });
+}
+
+function buildCard(d){
+  const div = document.createElement('div');
+  div.className = 'disc-card';
+  div.dataset.id = d.id;
+  div.innerHTML = `
+    <div class="disc-card-header">
+      <div class="disc-icon ${d.color}"><i class="fas ${d.icon}"></i></div>
+      <span class="disc-status ${getBadgeClass(d.status)}">${getStatusLabel(d.status)}</span>
+    </div>
+    <div class="disc-card-body">
+      <h3>${d.name}</h3>
+      <div class="disc-card-code">${d.code}</div>
+      <div class="disc-card-meta">
+        <span><i class="fas fa-clock"></i>${d.ch}h</span>
+        <span><i class="fas fa-star"></i>${d.credits} créditos</span>
+        <span><i class="fas fa-chalkboard-teacher"></i>${d.aulas.length} aulas</span>
+      </div>
+      <p style="font-size:12px;color:var(--gray);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${d.ementa}</p>
+    </div>
+    <div class="disc-card-actions">
+      <button class="btn-sm btn-primary" onclick="openPanel('${d.id}')"><i class="fas fa-folder-open"></i>Ver Materiais</button>
+      <button class="btn-sm btn-danger-sm btn-delete-disc" data-id="${d.id}"><i class="fas fa-trash"></i></button>
+    </div>`;
+  return div;
+}
+
+function buildPendingItem(d){
+  const div = document.createElement('div');
+  div.className='pending-item';
+  div.innerHTML=`
+    <div class="pending-icon ${d.color}" style="background:rgba(139,92,246,0.15);">
+      <i class="fas ${d.icon}" style="color:var(--gray)"></i>
+    </div>
+    <div class="pending-info">
+      <h4>${d.name}</h4>
+      <p>${d.code} · ${d.ch}h</p>
+    </div>`;
+  return div;
+}
+
+// ========================
+// PANEL
+// ========================
+function openPanel(id){
+  const d = appData.disciplines.find(x=>x.id===id);
+  if(!d) return;
+  document.getElementById('panel-title').textContent = `${d.code} — ${d.name}`;
+  document.getElementById('panel-body').innerHTML = buildPanelBody(d);
+  document.getElementById('disc-panel').classList.add('open');
+  document.body.style.overflow='hidden';
+  attachPanelEvents(d);
+}
+function closePanel(){
+  document.getElementById('disc-panel').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function buildPanelBody(d){
+  let aulasHTML = '';
+  if(d.aulas.length){
+    d.aulas.forEach(a=>{
+      const filesHTML = a.files.length
+        ? a.files.map(f=>{
+            const fname = typeof f==='object'?f.name:f;
+            const furl = typeof f==='object'?f.url:'';
+            const fkey = getFileKey(d.id, a.id, fname);
+            const icon = fname.endsWith('.pdf')?'fa-file-pdf':fname.endsWith('.docx')||fname.endsWith('.doc')?'fa-file-word':'fa-file';
+            return `
+          <div class="file-item">
+            <div class="file-item-left">
+              <i class="fas ${icon}"></i>
+              <span class="file-link" onclick="openFile('${furl}')">${fname}</span>
+            </div>
+            <div class="file-item-right">
+              <button class="btn-sm btn-ghost" onclick="removeFile('${d.id}','${a.id}','${fname}')"><i class="fas fa-times"></i></button>
+            </div>
+          </div>`;
+          }).join('')
+        : '<p style="font-size:12px;color:var(--gray);margin-bottom:8px;">Nenhum arquivo ainda.</p>';
+
+      aulasHTML += `
+        <div class="aula-item" id="aula-${d.id}-${a.id}">
+          <div class="aula-header" onclick="toggleAula('${d.id}-${a.id}')">
+            <div class="aula-header-left">
+              <div class="aula-num">${a.id}</div>
+              <span class="aula-title">${a.title}</span>
+            </div>
+            <i class="fas fa-chevron-right aula-chevron"></i>
+          </div>
+          <div class="aula-body">
+            <div class="file-list">${filesHTML}</div>
+            <div class="upload-zone" id="zone-${d.id}-${a.id}" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event,'${d.id}','${a.id}')">
+              <input type="file" multiple onchange="handleFileInput(event,'${d.id}','${a.id}')">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Arraste arquivos aqui ou clique para fazer upload</p>
+            </div>
+          </div>
+        </div>`;
+    });
+  } else {
+    aulasHTML = '<div class="empty-state"><i class="fas fa-book"></i><p>Nenhuma aula cadastrada para esta disciplina.</p></div>';
+  }
+
+  return `
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+      <span class="disc-status ${getBadgeClass(d.status)}">${getStatusLabel(d.status)}</span>
+      <span style="font-size:13px;color:var(--gray);display:flex;align-items:center;gap:6px;"><i class="fas fa-clock"></i>${d.ch} horas</span>
+      <span style="font-size:13px;color:var(--gray);display:flex;align-items:center;gap:6px;"><i class="fas fa-star"></i>${d.credits} créditos</span>
+    </div>
+    <div class="ementa-box"><strong style="color:var(--white);display:block;margin-bottom:8px;">📋 Ementa</strong>${d.ementa}</div>
+    <div class="aulas-section">
+      <h3><i class="fas fa-chalkboard-teacher" style="color:var(--blue3)"></i> Aulas (${d.aulas.length})</h3>
+      ${aulasHTML}
+    </div>
+    <div style="margin-top:20px;">
+      <button class="btn-sm btn-ghost" onclick="openAddAulaModal('${d.id}')"><i class="fas fa-plus"></i> Adicionar Aula</button>
+    </div>`;
+}
+
+function attachPanelEvents(d){}
+
+function toggleAula(id){
+  const el = document.getElementById('aula-'+id);
+  el.classList.toggle('expanded');
+}
+
+// ========================
+// CLOUD FILES (STORAGE)
+// ========================
+function openFile(url){
+  if(!url){showToast('error','Arquivo não sincronizado.');return;}
+  window.open(url,'_blank');
+}
+
+async function dropFile(e,discId,aulaId){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  const files = [...e.dataTransfer.files];
+  for(const f of files) await uploadFileCloud(discId,aulaId,f);
+}
+async function handleFileInput(e,discId,aulaId){
+  const files = [...e.target.files];
+  for(const f of files) await uploadFileCloud(discId,aulaId,f);
+}
+
+// ========================
+// DRAG & DROP HELPERS
+// ========================
+function dragOver(e){
+  e.preventDefault();
+  e.currentTarget.classList.add('dragover');
+}
+function dragLeave(e){
+  e.currentTarget.classList.remove('dragover');
+}
+
+// ========================
+// FILE KEY HELPER
+// ========================
+function getFileKey(discId, aulaId, filename){
+  return `${discId}__${aulaId}__${filename}`;
+}
+
+function calendarId(id){ return id.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+async function uploadFileCloud(discId,aulaId,file){
+  showSyncing(true);
+  try{
+    const path = `files/${getDocId()}/${calendarId(discId)}/${aulaId}/${file.name}`;
+    const ref = storage.ref().child(path);
+    const snap = await ref.put(file);
+    const url = await snap.ref.getDownloadURL();
+    const d = appData.disciplines.find(x=>x.id===discId);
+    const a = d.aulas.find(x=>String(x.id)===String(aulaId));
+    // evita duplicata
+    if(!a.files.find(f=>(typeof f==='object'?f.name:f)===file.name)){
+      a.files.push({name: file.name, url: url});
+    }
+    await saveData();
+    openPanel(discId);
+    showToast('success','Arquivo na nuvem: '+file.name);
+  }catch(e){
+    console.error(e);
+    showToast('error','Erro no upload. Verifique Firebase Storage.');
+  }
+  showSyncing(false);
+}
+
+async function removeFile(discId,aulaId,filename){
+  const d = appData.disciplines.find(x=>x.id===discId);
+  const a = d.aulas.find(x=>String(x.id)===String(aulaId));
+  a.files = a.files.filter(f=>(typeof f==='object'?f.name:f)!==filename);
+  await saveData();
+  openPanel(discId);
+  showToast('success','Arquivo removido.');
+}
+
+async function updateStatus(id, newStatus){
+  const d = appData.disciplines.find(x=>x.id===id);
+  if(d){ d.status = newStatus; await saveData(); renderCards(); }
+}
+
+// ========================
+// MODAL ADD AULA
+// ========================
+let _currentAulaDiscId = null;
+function openAddAulaModal(discId){
+  _currentAulaDiscId = discId;
+  document.getElementById('aula-titulo').value = '';
+  document.getElementById('aula-num-custom').value = '';
+  document.getElementById('aula-disc-id').value = discId;
+  document.getElementById('modal-aula').classList.add('open');
+  setTimeout(()=>document.getElementById('aula-titulo').focus(), 100);
+}
+function closeAulaModal(){
+  document.getElementById('modal-aula').classList.remove('open');
+  _currentAulaDiscId = null;
+}
+function saveAula(){
+  const discId = document.getElementById('aula-disc-id').value;
+  const titulo = document.getElementById('aula-titulo').value.trim();
+  const numCustom = document.getElementById('aula-num-custom').value.trim();
+  if(!titulo){showToast('error','Digite o título da aula!');return;}
+  const d = appData.disciplines.find(x=>x.id===discId);
+  if(!d){showToast('error','Disciplina não encontrada!');return;}
+  const newId = numCustom || (d.aulas.length + 1);
+  d.aulas.push({id: isNaN(Number(newId)) ? newId : Number(newId), title:titulo, files:[]});
+  saveData(appData);
+  closeAulaModal();
+  openPanel(discId);
+  showToast('success','Aula "'+titulo+'" adicionada!');
+}
+
+// ========================
+// MODAL NOVA DISCIPLINA
+// ========================
+function openModal(){document.getElementById('modal-disc').classList.add('open');}
+function closeModal(){document.getElementById('modal-disc').classList.remove('open');}
+function saveDiscipline(){
+  const nome = document.getElementById('f-nome').value.trim().toUpperCase();
+  const codigo = document.getElementById('f-codigo').value.trim().toUpperCase();
+  const creditos = parseInt(document.getElementById('f-creditos').value)||0;
+  const ch = parseInt(document.getElementById('f-ch').value)||48;
+  const status = document.getElementById('f-status').value;
+  const ementa = document.getElementById('f-ementa').value.trim();
+  const nAulas = parseInt(document.getElementById('f-aulas').value)||0;
+  if(!nome||!codigo){showToast('error','Preencha nome e código!');return;}
+  const colors=['blue','gold','green','purple','red'];
+  const icons=['fa-book','fa-flask','fa-chart-bar','fa-file-alt','fa-scroll','fa-sitemap'];
+  const aulas = Array.from({length:nAulas},(_,i)=>({id:i+1,title:`Aula ${i+1}`,files:[]}));
+  const disc = {
+    id: codigo.toLowerCase().replace(/[^a-z0-9]/g,''),
+    code:codigo, name:nome, credits:creditos, ch, status, ementa,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    icon: icons[Math.floor(Math.random()*icons.length)],
+    aulas
+  };
+  appData.disciplines.push(disc);
+  saveData(appData);
+  renderCards();
+  closeModal();
+  document.getElementById('f-nome').value='';
+  document.getElementById('f-codigo').value='';
+  document.getElementById('f-creditos').value='';
+  document.getElementById('f-ch').value='';
+  document.getElementById('f-ementa').value='';
+  document.getElementById('f-aulas').value='';
+  showToast('success',`Disciplina "${nome}" adicionada!`);
+}
+
+// ========================
+// DELETE DISCIPLINE (com limpeza do Storage)
+// ========================
+async function deleteDisc(id){
+  if(!confirm('Remover esta disciplina? Esta ação não pode ser desfeita.')) return;
+  const d = appData.disciplines.find(x=>x.id===id);
+  if(!d) return;
+  // Remove arquivos do Storage antes de deletar
+  if(!isOffline && d.aulas){
+    for(const aula of d.aulas){
+      for(const f of (aula.files||[])){
+        if(typeof f === 'object' && f.url){
+          try{
+            const path = `files/${getDocId()}/${calendarId(d.id)}/${aula.id}/${f.name}`;
+            await storage.ref().child(path).delete();
+          }catch(err){ console.warn('Storage delete orphan:', err.code); }
+        }
+      }
+    }
+  }
+  appData.disciplines = appData.disciplines.filter(x=>x.id!==id);
+  await saveData();
+  renderCards();
+  showToast('success','Disciplina e arquivos removidos.');
+}
+
+// ========================
+// TABS
+// ========================
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ========================
+// TOAST
+// ========================
+function showToast(type, msg){
+  const old = document.querySelector('.toast');
+  if(old) old.remove();
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+// ========================
+// INIT (ASYNC CLOUD)
+// ========================
+document.addEventListener('DOMContentLoaded', async ()=>{
+  showSyncing(true);
+  try{
+    await initAuth();
+    await loadData();
+    await loadStudent();
+    
+    renderStudentCard();
+    renderCards();
+    updateProgress();
+    showSyncing(false);
+  }catch(e){
+    console.error(e);
+    showToast('error','Falha na conexão com a nuvem.');
+  }
+
+  // Close modals on backdrop click
+  document.getElementById('modal-disc').addEventListener('click', e=>{
+    if(e.target===document.getElementById('modal-disc')) closeModal();
+  });
+  document.getElementById('modal-aula').addEventListener('click', e=>{
+    if(e.target===document.getElementById('modal-aula')) closeAulaModal();
+  });
+  document.getElementById('modal-student').addEventListener('click', e=>{
+    if(e.target===document.getElementById('modal-student')) closeStudentModal();
+  });
+  // Enter key on aula modal
+  document.getElementById('aula-titulo').addEventListener('keydown', e=>{
+    if(e.key==='Enter') saveAula();
+  });
+});
+
+// ========================
+// PROGRESSO DINÂMICO
+// ========================
+function updateProgress(){
+  if(!appData) return;
+  const discs = appData.disciplines;
+  const MAX_CH = 480, MAX_CR = 30;
+  const doneCH = discs.filter(d=>d.status==='concluido').reduce((s,d)=>s+(d.ch||0),0);
+  const doneCR = discs.filter(d=>d.status==='concluido').reduce((s,d)=>s+(d.credits||0),0);
+  const pctCH  = Math.min(100, Math.round((doneCH/MAX_CH)*100));
+  const pctCR  = Math.min(100, Math.round((doneCR/MAX_CR)*100));
+  const ativas = discs.filter(d=>d.status==='matriculado').length;
+
+  // Barras de progresso
+  const fills = document.querySelectorAll('.progress-fill');
+  if(fills[0]) setTimeout(()=>fills[0].style.width=pctCH+'%', 200);
+  if(fills[1]) setTimeout(()=>fills[1].style.width=pctCR+'%', 200);
+
+  // Textos das barras
+  const blocks = document.querySelectorAll('.progress-block');
+  if(blocks[0]){
+    blocks[0].querySelector('.progress-header span').textContent = `${doneCH} / ${MAX_CH}h`;
+    blocks[0].querySelector('.progress-meta').innerHTML =
+      `<span>${pctCH}% integralizado</span><span>${MAX_CH-doneCH}h pendente</span>`;
+  }
+  if(blocks[1]){
+    blocks[1].querySelector('.progress-header span').textContent = `${doneCR} / ${MAX_CR}`;
+    blocks[1].querySelector('.progress-meta').innerHTML =
+      `<span>${pctCR}% integralizado</span><span>${MAX_CR-doneCR} pendentes</span>`;
+  }
+
+  // Hero stats
+  const heroVals = document.querySelectorAll('.hero-stat-val');
+  if(heroVals[0]) heroVals[0].textContent = ativas;
+  if(heroVals[1]) heroVals[1].textContent = pctCH+'%';
+}
+</script>
+</body>
+</html>
