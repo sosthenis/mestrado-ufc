@@ -50,18 +50,56 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop
 .nav-links a:hover{background:rgba(0,51,102,0.08);color:var(--blue);}
 .btn-upload-nav{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff!important;border-radius:8px!important;}
 
-/* HERO & SPLASH */
-.hero{position:relative;padding:120px 2rem 160px;text-align:center;overflow:hidden;background:#f4f8fc;}
-.hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&q=80&w=2000');background-size:cover;background-position:center;animation:heroKenBurns 40s ease-in-out infinite alternate;z-index:0;filter:brightness(1.02) contrast(1.05);}
-.hero-overlay{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 60%), linear-gradient(0deg, var(--navy) 5%, transparent 100%);z-index:1;}
+/* HERO & LIVING WAVES */
+.hero{position:relative;padding:120px 2rem 150px;text-align:center;overflow:hidden;background:linear-gradient(160deg, #020c1b 0%, #0a1628 15%, #0d2137 30%, #0a3d62 50%, #0e6ba8 75%, #2196f3 100%);}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%, rgba(33,150,243,0.25) 0%, transparent 55%),radial-gradient(ellipse at 20% 80%, rgba(0,188,212,0.15) 0%, transparent 50%);z-index:1;}
 
-@keyframes heroKenBurns {
-  0% { transform: scale(1) translate(0,0); }
-  100% { transform: scale(1.15) translate(-2%,-2%); }
+/* Flowing organic wave layers — MORE DYNAMIC */
+.hero-wave-layer{position:absolute;width:250%;height:100%;left:-75%;z-index:2;}
+.hero-wave-layer svg{width:100%;height:100%;}
+.wave-flow-1{bottom:-5%;animation:waveFlow1 5s ease-in-out infinite;opacity:0.9;}
+.wave-flow-2{bottom:-8%;animation:waveFlow2 6s ease-in-out infinite;opacity:0.7;}
+.wave-flow-3{bottom:-12%;animation:waveFlow3 7s ease-in-out infinite;opacity:0.6;}
+.wave-flow-4{top:25%;animation:waveFlow4 9s ease-in-out infinite;opacity:0.4;}
+.wave-flow-5{top:45%;animation:waveFlow5 11s ease-in-out infinite;opacity:0.2;}
+
+@keyframes waveFlow1 {
+  0%,100% { transform: translateX(0) scaleY(1); }
+  25% { transform: translateX(5%) scaleY(1.15); }
+  75% { transform: translateX(-3%) scaleY(0.9); }
+}
+@keyframes waveFlow2 {
+  0%,100% { transform: translateX(0) scaleY(1) rotate(0deg); }
+  30% { transform: translateX(-6%) scaleY(1.2) rotate(1deg); }
+  70% { transform: translateX(4%) scaleY(0.85) rotate(-0.5deg); }
+}
+@keyframes waveFlow3 {
+  0%,100% { transform: translateX(0) scaleY(1); }
+  20% { transform: translateX(4%) scaleY(0.8); }
+  50% { transform: translateX(-5%) scaleY(1.25); }
+  80% { transform: translateX(3%) scaleY(1.05); }
+}
+@keyframes waveFlow4 {
+  0%,100% { transform: translateX(0) scaleY(1) rotate(0deg); }
+  25% { transform: translateX(7%) scaleY(1.3) rotate(-1.5deg); }
+  50% { transform: translateX(-4%) scaleY(0.8) rotate(1deg); }
+  75% { transform: translateX(5%) scaleY(1.15) rotate(-0.5deg); }
+}
+@keyframes waveFlow5 {
+  0%,100% { transform: translateX(0) scaleY(1); }
+  50% { transform: translateX(-8%) scaleY(1.4) rotate(2deg); }
 }
 
+/* Shimmer — STRONGER */
+.hero-shimmer{position:absolute;inset:0;background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.12) 42%, rgba(100,200,255,0.08) 48%, transparent 55%);background-size:250% 100%;animation:shimmer 4s ease-in-out infinite;z-index:3;pointer-events:none;}
+@keyframes shimmer {
+  0%{background-position:250% 0;}
+  100%{background-position:-250% 0;}
+}
+
+/* Bottom transition waves */
 .hero-waves-container{position:absolute;bottom:0;left:0;width:100%;line-height:0;z-index:4;}
-.waves{position:relative;width:100%;height:10vh;min-height:100px;max-height:150px;}
+.waves{position:relative;width:100%;height:10vh;min-height:80px;max-height:120px;}
 .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
 .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
 .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
@@ -69,12 +107,15 @@ nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop
 .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
 @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
 
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,51,102,0.1);border:1px solid rgba(0,51,102,0.2);border-radius:50px;padding:8px 20px;font-size:12px;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;position:relative;z-index:5;backdrop-filter:blur(10px);font-weight:700;}
-.hero h1{font-family:'Outfit',sans-serif;font-size:clamp(32px,5vw,56px);font-weight:800;line-height:1.1;margin-bottom:16px;color:var(--blue);position:relative;z-index:5;text-shadow:0 0 40px rgba(255,255,255,0.6);}
-.hero-sub{font-size:17px;color:var(--blue);opacity:0.9;max-width:750px;margin:0 auto 40px;line-height:1.7;position:relative;z-index:5;font-weight:500;}
-.hero-stats{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-top:40px;position:relative;z-index:5;}
-.hero-stat-val{font-family:'Outfit',sans-serif;font-size:36px;font-weight:800;color:var(--blue);}
-.hero-stat-label{font-size:12px;color:var(--blue);opacity:0.75;text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:700;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:50px;padding:8px 20px;font-size:12px;color:rgba(255,255,255,0.9);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;position:relative;z-index:5;backdrop-filter:blur(12px);font-weight:700;}
+.hero h1{font-family:'Outfit',sans-serif;font-size:clamp(30px,5vw,52px);font-weight:800;line-height:1.12;margin-bottom:16px;color:#fff;position:relative;z-index:5;text-shadow:0 2px 30px rgba(0,0,0,0.3);}
+.hero-sub{font-size:16px;color:rgba(255,255,255,0.85);max-width:750px;margin:0 auto 40px;line-height:1.7;position:relative;z-index:5;font-weight:500;}
+.hero-stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:40px;position:relative;z-index:5;}
+.hero-stat{background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:16px 24px;min-width:120px;transition:.3s;}
+.hero-stat:hover{background:rgba(255,255,255,0.15);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.3);}
+.hero-stat-val{font-family:'Outfit',sans-serif;font-size:32px;font-weight:800;color:#fff;}
+.hero-stat-label{font-size:11px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:700;}
+
 
 /* MESTRADO CARD */
 .section{padding:40px 2rem;max-width:1280px;margin:auto;}
@@ -283,15 +324,32 @@ textarea.form-control{min-height:100px;resize:vertical;}
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
+  <!-- Flowing wave layers -->
+  <div class="hero-wave-layer wave-flow-5">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="rgba(33,150,243,0.15)" d="M0,96L60,112C120,128,240,160,360,176C480,192,600,192,720,176C840,160,960,128,1080,122.7C1200,117,1320,139,1380,149.3L1440,160L1440,320L0,320Z"></path></svg>
+  </div>
+  <div class="hero-wave-layer wave-flow-4">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="rgba(14,107,168,0.5)" d="M0,224L48,213.3C96,203,192,181,288,186.7C384,192,480,224,576,234.7C672,245,768,235,864,208C960,181,1056,139,1152,133.3C1248,128,1344,160,1392,176L1440,192L1440,320L0,320Z"></path></svg>
+  </div>
+  <div class="hero-wave-layer wave-flow-3">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="rgba(10,61,98,0.6)" d="M0,288L60,272C120,256,240,224,360,218.7C480,213,600,235,720,245.3C840,256,960,256,1080,234.7C1200,213,1320,171,1380,149.3L1440,128L1440,320L0,320Z"></path></svg>
+  </div>
+  <div class="hero-wave-layer wave-flow-2">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="rgba(0,150,180,0.45)" d="M0,160L48,176C96,192,192,224,288,229.3C384,235,480,213,576,202.7C672,192,768,192,864,202.7C960,213,1056,235,1152,229.3C1248,224,1344,192,1392,176L1440,160L1440,320L0,320Z"></path></svg>
+  </div>
+  <div class="hero-wave-layer wave-flow-1">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="rgba(2,12,27,0.6)" d="M0,256L48,240C96,224,192,192,288,192C384,192,480,224,576,240C672,256,768,256,864,234.7C960,213,1056,171,1152,165.3C1248,160,1344,192,1392,208L1440,224L1440,320L0,320Z"></path></svg>
+  </div>
+  <div class="hero-shimmer"></div>
+
+  <!-- Bottom transition -->
   <div class="hero-waves-container">
     <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
       <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
       <g class="parallax">
-        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.1)" />
-        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.07)" />
-        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.05)" />
+        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(1,87,155,0.15)" />
+        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(2,136,209,0.1)" />
+        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(79,195,247,0.08)" />
         <use xlink:href="#gentle-wave" x="48" y="7" fill="var(--navy)" />
       </g>
     </svg>
@@ -303,7 +361,7 @@ textarea.form-control{min-height:100px;resize:vertical;}
     <div class="hero-stat"><div class="hero-stat-val">3</div><div class="hero-stat-label">Disciplinas Ativas</div></div>
     <div class="hero-stat"><div class="hero-stat-val">0%</div><div class="hero-stat-label">C.H. Integralizada</div></div>
     <div class="hero-stat"><div class="hero-stat-val">30</div><div class="hero-stat-label">Créditos Exigidos</div></div>
-    <div class="hero-stat"><div class="hero-stat-val">DEZ/27</div><div class="hero-stat-label">Prazo Final</div></div>
+    <div class="hero-stat"><div class="hero-stat-val">FEV/28</div><div class="hero-stat-label">Prazo Final</div></div>
   </div>
 </section>
 
