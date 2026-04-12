@@ -242,6 +242,161 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,22,35,0.45);backdrop-fi
 .empty-state i{font-size:48px;margin-bottom:16px;opacity:.4;}
 .empty-state p{font-size:14px;max-width:250px;margin:0 auto;}
 
+/* ======================== */
+/* CRUD MODALS              */
+/* ======================== */
+.crud-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+  animation:fadeOverlay .2s ease;
+}
+.crud-overlay.open{display:flex;}
+@keyframes fadeOverlay{from{opacity:0;}to{opacity:1;}}
+
+.crud-modal{
+  background:rgba(16,29,46,0.97);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:18px;
+  padding:0;
+  width:min(500px,92vw);
+  box-shadow:0 30px 100px rgba(0,0,0,0.7),0 0 60px rgba(14,107,168,0.12);
+  animation:modalPop .25s cubic-bezier(.34,1.56,.64,1);
+  overflow:hidden;
+  position:relative;
+}
+@keyframes modalPop{from{opacity:0;transform:scale(0.88) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+.crud-modal-head{
+  padding:20px 24px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:12px;
+}
+.crud-modal-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;
+}
+.crud-modal-icon.danger{background:rgba(239,68,68,0.18);color:#f87171;}
+.crud-modal-icon.info{background:rgba(14,107,168,0.25);color:var(--blue3);}
+.crud-modal-icon.warn{background:rgba(245,158,11,0.18);color:var(--amber);}
+.crud-modal-title{
+  font-family:'Outfit',sans-serif;
+  font-size:17px;font-weight:700;color:#fff;
+  line-height:1.3;
+}
+.crud-modal-subtitle{
+  font-size:11px;color:var(--gray);margin-top:2px;
+}
+.crud-modal-body{
+  padding:20px 24px;
+}
+.crud-modal-body p{
+  font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:14px;
+}
+.crud-modal-body p strong{color:#fff;}
+
+/* Form fields inside modal */
+.crud-field{margin-bottom:14px;}
+.crud-field label{
+  display:block;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.8px;
+  color:var(--gray);margin-bottom:6px;
+}
+.crud-field input,.crud-field select,.crud-field textarea{
+  width:100%;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:9px;padding:10px 13px;
+  color:var(--white);font-size:13px;
+  font-family:'Inter',sans-serif;outline:none;
+  transition:.2s;
+}
+.crud-field input:focus,.crud-field select:focus,.crud-field textarea:focus{
+  border-color:rgba(79,195,247,0.5);
+  background:rgba(79,195,247,0.05);
+  box-shadow:0 0 0 3px rgba(79,195,247,0.08);
+}
+.crud-field input::placeholder,.crud-field textarea::placeholder{color:var(--gray2);}
+.crud-field select option{background:var(--navy2);color:var(--white);}
+.crud-field textarea{resize:vertical;min-height:80px;line-height:1.6;}
+.crud-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+.crud-modal-foot{
+  display:flex;gap:10px;justify-content:flex-end;
+  padding:14px 24px 20px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.crud-btn{
+  padding:9px 20px;border-radius:9px;font-size:13px;
+  font-weight:600;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;
+  transition:.25s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;gap:7px;
+}
+.crud-btn-cancel{
+  background:rgba(255,255,255,0.05);
+  color:var(--gray);
+  border:1px solid rgba(255,255,255,0.08);
+}
+.crud-btn-cancel:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.crud-btn-danger{
+  background:linear-gradient(135deg,#dc2626,#b91c1c);
+  color:#fff;
+  box-shadow:0 2px 12px rgba(220,38,38,0.35);
+}
+.crud-btn-danger:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 6px 20px rgba(220,38,38,0.5);}
+.crud-btn-primary{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#fff;
+  box-shadow:0 2px 12px rgba(14,107,168,0.35);
+}
+.crud-btn-primary:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 6px 20px rgba(14,107,168,0.5);}
+
+/* Warning box inside modal */
+.crud-warn-box{
+  background:rgba(239,68,68,0.07);
+  border:1px solid rgba(239,68,68,0.2);
+  border-radius:9px;padding:12px 14px;
+  font-size:12px;color:#fca5a5;
+  display:flex;gap:10px;align-items:flex-start;
+  margin-bottom:4px;
+}
+.crud-warn-box i{color:#f87171;margin-top:1px;flex-shrink:0;font-size:13px;}
+
+/* Action buttons on cards and panels */
+.btn-icon-action{
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;border:none;cursor:pointer;
+  transition:.2s;flex-shrink:0;
+}
+.btn-icon-del{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.15);}
+.btn-icon-del:hover{background:rgba(239,68,68,0.25);border-color:rgba(239,68,68,0.4);transform:scale(1.08);}
+.btn-icon-edit{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.15);}
+.btn-icon-edit:hover{background:rgba(245,158,11,0.25);border-color:rgba(245,158,11,0.4);transform:scale(1.08);}
+.btn-icon-add{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.15);}
+.btn-icon-add:hover{background:rgba(16,185,129,0.25);border-color:rgba(16,185,129,0.4);transform:scale(1.08);}
+
+/* Panel action bar */
+.panel-actions{display:flex;gap:8px;align-items:center;}
+.panel-action-btn{
+  padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;font-family:'Inter',sans-serif;
+  transition:.25s;display:flex;align-items:center;gap:6px;
+}
+.panel-action-btn.add-aula{
+  background:rgba(16,185,129,0.1);color:var(--green);
+  border:1px solid rgba(16,185,129,0.2);
+}
+.panel-action-btn.add-aula:hover{background:rgba(16,185,129,0.22);border-color:rgba(16,185,129,0.5);}
+.panel-action-btn.del-disc{
+  background:rgba(239,68,68,0.08);color:#f87171;
+  border:1px solid rgba(239,68,68,0.15);
+}
+.panel-action-btn.del-disc:hover{background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.4);}
+
 /* FOOTER */
 footer{text-align:center;padding:40px 2rem;color:var(--gray2);font-size:12px;border-top:1px solid var(--border);}
 footer a{color:var(--blue3);text-decoration:none;}
@@ -760,9 +915,16 @@ body.has-status-bar nav{top:28px;}
 
 <!-- DISCIPLINAS -->
 <div id="disciplinas" class="section">
-  <div class="section-title">
-    <i class="fas fa-book-open"></i> Disciplinas
-    <span style="background:rgba(79,195,247,0.15);color:var(--blue3);font-size:12px;padding:3px 10px;border-radius:50px;font-weight:700;" id="disc-count">6</span>
+  <div class="section-title" style="justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <i class="fas fa-book-open"></i> Disciplinas
+      <span style="background:rgba(79,195,247,0.15);color:var(--blue3);font-size:12px;padding:3px 10px;border-radius:50px;font-weight:700;" id="disc-count">6</span>
+    </div>
+    <button class="panel-action-btn" onclick="openAddDisciplineModal()"
+      style="background:rgba(79,195,247,0.1);color:var(--blue3);border:1px solid rgba(79,195,247,0.2);font-size:12px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:7px;"
+      onmouseover="this.style.background='rgba(79,195,247,0.22)'" onmouseout="this.style.background='rgba(79,195,247,0.1)'">
+      <i class="fas fa-plus"></i> Nova Disciplina
+    </button>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('todas',this)">Todas</button>
@@ -785,9 +947,152 @@ body.has-status-bar nav{top:28px;}
 <div class="disc-panel" id="disc-panel">
   <div class="panel-header">
     <h2 id="panel-title">—</h2>
-    <button class="btn-close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
+    <div class="panel-actions">
+      <button class="panel-action-btn add-aula" id="btn-add-aula" onclick="openAddAulaModal()">
+        <i class="fas fa-plus"></i> Nova Aula
+      </button>
+      <button class="panel-action-btn del-disc" id="btn-del-disc" onclick="openDeleteDiscModal()">
+        <i class="fas fa-trash"></i> Excluir Disciplina
+      </button>
+      <button class="btn-close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
+    </div>
   </div>
   <div class="panel-body" id="panel-body"></div>
+</div>
+
+<!-- ==================== -->
+<!-- CRUD MODALS          -->
+<!-- ==================== -->
+
+<!-- CONFIRM DELETE MODAL (generic) -->
+<div class="crud-overlay" id="modal-confirm">
+  <div class="crud-modal">
+    <div class="crud-modal-head">
+      <div class="crud-modal-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+      <div>
+        <div class="crud-modal-title" id="modal-confirm-title">Confirmar exclusão</div>
+        <div class="crud-modal-subtitle" id="modal-confirm-subtitle">Esta ação não pode ser desfeita.</div>
+      </div>
+    </div>
+    <div class="crud-modal-body">
+      <p id="modal-confirm-msg"></p>
+      <div class="crud-warn-box">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="modal-confirm-warn">Todos os dados e materiais vinculados serão removidos permanentemente.</span>
+      </div>
+    </div>
+    <div class="crud-modal-foot">
+      <button class="crud-btn crud-btn-cancel" onclick="closeModal('modal-confirm')">Cancelar</button>
+      <button class="crud-btn crud-btn-danger" id="modal-confirm-ok"><i class="fas fa-trash"></i> Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DISCIPLINE MODAL -->
+<div class="crud-overlay" id="modal-add-disc">
+  <div class="crud-modal">
+    <div class="crud-modal-head">
+      <div class="crud-modal-icon info"><i class="fas fa-book-open"></i></div>
+      <div>
+        <div class="crud-modal-title">Nova Disciplina</div>
+        <div class="crud-modal-subtitle">Preencha os dados para adicionar ao programa</div>
+      </div>
+    </div>
+    <div class="crud-modal-body">
+      <div class="crud-field-row">
+        <div class="crud-field">
+          <label>Código *</label>
+          <input type="text" id="ndisc-code" placeholder="EDP704A" maxlength="12">
+        </div>
+        <div class="crud-field">
+          <label>Status *</label>
+          <select id="ndisc-status">
+            <option value="matriculado">Matriculado</option>
+            <option value="pendente">Pendente</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+      <div class="crud-field">
+        <label>Nome da Disciplina *</label>
+        <input type="text" id="ndisc-name" placeholder="Ex: CONTABILIDADE GERENCIAL">
+      </div>
+      <div class="crud-field-row">
+        <div class="crud-field">
+          <label>Carga Horária (h) *</label>
+          <input type="number" id="ndisc-ch" placeholder="48" min="1" max="999">
+        </div>
+        <div class="crud-field">
+          <label>Créditos</label>
+          <input type="number" id="ndisc-credits" placeholder="3" min="0" max="30">
+        </div>
+      </div>
+      <div class="crud-field">
+        <label>Ementa</label>
+        <textarea id="ndisc-ementa" placeholder="Descrição do conteúdo programático da disciplina..."></textarea>
+      </div>
+      <div class="crud-field">
+        <label>Cor do Ícone</label>
+        <select id="ndisc-color">
+          <option value="blue">🔵 Azul</option>
+          <option value="gold">🟡 Dourado</option>
+          <option value="green">🟢 Verde</option>
+          <option value="purple">🟣 Roxo</option>
+          <option value="red">🔴 Vermelho</option>
+        </select>
+      </div>
+    </div>
+    <div class="crud-modal-foot">
+      <button class="crud-btn crud-btn-cancel" onclick="closeModal('modal-add-disc')">Cancelar</button>
+      <button class="crud-btn crud-btn-primary" onclick="confirmAddDiscipline()"><i class="fas fa-plus"></i> Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD AULA MODAL -->
+<div class="crud-overlay" id="modal-add-aula">
+  <div class="crud-modal">
+    <div class="crud-modal-head">
+      <div class="crud-modal-icon info"><i class="fas fa-chalkboard-teacher"></i></div>
+      <div>
+        <div class="crud-modal-title">Nova Aula</div>
+        <div class="crud-modal-subtitle" id="modal-add-aula-subtitle">Adicionar aula à disciplina</div>
+      </div>
+    </div>
+    <div class="crud-modal-body">
+      <div class="crud-field">
+        <label>Título da Aula *</label>
+        <input type="text" id="naula-title" placeholder="Ex: 16 ABRIL — Aula 2: Teoria Clássica">
+      </div>
+    </div>
+    <div class="crud-modal-foot">
+      <button class="crud-btn crud-btn-cancel" onclick="closeModal('modal-add-aula')">Cancelar</button>
+      <button class="crud-btn crud-btn-primary" onclick="confirmAddAula()"><i class="fas fa-plus"></i> Adicionar Aula</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME AULA MODAL -->
+<div class="crud-overlay" id="modal-rename-aula">
+  <div class="crud-modal">
+    <div class="crud-modal-head">
+      <div class="crud-modal-icon warn"><i class="fas fa-pen"></i></div>
+      <div>
+        <div class="crud-modal-title">Renomear Aula</div>
+        <div class="crud-modal-subtitle">Edite o título da aula</div>
+      </div>
+    </div>
+    <div class="crud-modal-body">
+      <div class="crud-field">
+        <label>Novo Título *</label>
+        <input type="text" id="rename-aula-input" placeholder="Título da aula..." onkeydown="if(event.key==='Enter')confirmRenameAula()">
+      </div>
+    </div>
+    <div class="crud-modal-foot">
+      <button class="crud-btn crud-btn-cancel" onclick="closeModal('modal-rename-aula')">Cancelar</button>
+      <button class="crud-btn crud-btn-primary" onclick="confirmRenameAula()"><i class="fas fa-check"></i> Salvar</button>
+    </div>
+  </div>
 </div>
 
 <!-- BOT AI FAB -->
@@ -1165,7 +1470,13 @@ function buildCard(d) {
   div.innerHTML = `
     <div class="disc-card-header">
       <div class="disc-icon ${d.color}"><i class="fas ${d.icon}"></i></div>
-      <span class="disc-status ${getBadgeClass(d.status)}">${getStatusLabel(d.status)}</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="disc-status ${getBadgeClass(d.status)}">${getStatusLabel(d.status)}</span>
+        <button class="btn-icon-action btn-icon-del" title="Excluir disciplina"
+          onclick="event.stopPropagation();openDeleteDiscById('${d.id}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
     <div class="disc-card-body">
       <h3>${d.name}</h3>
@@ -1209,6 +1520,7 @@ function buildPendingItem(d) {
 function openPanel(id) {
   const d = disciplines.find(x => x.id === id);
   if (!d) return;
+  _currentPanelDiscId = id;
   document.getElementById('panel-title').textContent = `${d.code} — ${d.name}`;
   document.getElementById('panel-body').innerHTML = buildPanelBody(d);
   document.getElementById('disc-panel').classList.add('open');
@@ -1264,9 +1576,17 @@ function buildPanelBody(d) {
               <div class="aula-num">${index + 1}</div>
               <span class="aula-title">${a.title}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:11px;color:var(--gray);margin-right:4px;">${a.files ? a.files.length : 0} <i class="fas fa-paperclip" style="font-size:10px;"></i></span>
-              <i class="fas fa-chevron-right aula-chevron"></i>
+            <div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation()">
+              <span style="font-size:11px;color:var(--gray);">${a.files ? a.files.length : 0} <i class="fas fa-paperclip" style="font-size:10px;"></i></span>
+              <button class="btn-icon-action btn-icon-edit" title="Renomear aula"
+                onclick="openRenameAulaModal('${d.id}',${a.id})">
+                <i class="fas fa-pen"></i>
+              </button>
+              <button class="btn-icon-action btn-icon-del" title="Excluir aula"
+                onclick="openDeleteAulaModal('${d.id}',${a.id})">
+                <i class="fas fa-trash"></i>
+              </button>
+              <i class="fas fa-chevron-right aula-chevron" onclick="toggleAula('${d.id}-${a.id}')"></i>
             </div>
           </div>
           <div class="aula-body">
@@ -1333,6 +1653,191 @@ function updateProgress() {
   // Hero stats
   document.getElementById('stat-ativas').textContent = ativas;
   document.getElementById('stat-ch').textContent = pctCH + '%';
+}
+
+// ========================
+// CRUD — DISCIPLINES
+// ========================
+let _currentPanelDiscId = null;
+
+function openAddDisciplineModal() {
+  // Clear form
+  ['ndisc-code','ndisc-name','ndisc-ch','ndisc-credits','ndisc-ementa'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('ndisc-status').value = 'matriculado';
+  document.getElementById('ndisc-color').value = 'blue';
+  openModal('modal-add-disc');
+  setTimeout(() => document.getElementById('ndisc-code').focus(), 200);
+}
+
+function confirmAddDiscipline() {
+  const code = document.getElementById('ndisc-code').value.trim().toUpperCase();
+  const name = document.getElementById('ndisc-name').value.trim().toUpperCase();
+  const ch   = parseInt(document.getElementById('ndisc-ch').value) || 0;
+  const credits = parseInt(document.getElementById('ndisc-credits').value) || 0;
+  const status  = document.getElementById('ndisc-status').value;
+  const ementa  = document.getElementById('ndisc-ementa').value.trim();
+  const color   = document.getElementById('ndisc-color').value;
+
+  if (!code || !name || !ch) {
+    showToast('Preencha os campos obrigatórios (código, nome e carga horária).','error');
+    return;
+  }
+  if (disciplines.find(d => d.code === code)) {
+    showToast(`Já existe uma disciplina com o código ${code}.`, 'error');
+    return;
+  }
+
+  const iconMap = {blue:'fa-book',gold:'fa-flask',green:'fa-chart-bar',purple:'fa-language',red:'fa-file-alt'};
+  const newDisc = {
+    id: code.toLowerCase().replace(/[^a-z0-9]/g,''),
+    code, name, ch, credits, status, ementa,
+    color, icon: iconMap[color] || 'fa-book',
+    aulas: []
+  };
+  disciplines.push(newDisc);
+  closeModal('modal-add-disc');
+  renderCards();
+  updateProgress();
+  showToast(`Disciplina "${name}" adicionada com sucesso!`, 'success');
+}
+
+function openDeleteDiscById(id) {
+  _currentPanelDiscId = id;
+  openDeleteDiscModal();
+}
+
+function openDeleteDiscModal() {
+  const id = _currentPanelDiscId || (document.getElementById('disc-panel').classList.contains('open') ? _currentPanelDiscId : null);
+  const d = disciplines.find(x => x.id === _currentPanelDiscId);
+  if (!d) return;
+  document.getElementById('modal-confirm-title').textContent = 'Excluir Disciplina';
+  document.getElementById('modal-confirm-subtitle').textContent = d.code + ' — ' + d.name;
+  document.getElementById('modal-confirm-msg').innerHTML =
+    `Tem certeza que deseja excluir a disciplina <strong>${d.name}</strong>?`;
+  document.getElementById('modal-confirm-warn').textContent =
+    `Todas as ${d.aulas.length} aula(s) e materiais vinculados serão removidos permanentemente.`;
+  const okBtn = document.getElementById('modal-confirm-ok');
+  okBtn.onclick = () => {
+    disciplines = disciplines.filter(x => x.id !== _currentPanelDiscId);
+    closeModal('modal-confirm');
+    closePanel();
+    renderCards();
+    updateProgress();
+    showToast(`Disciplina "${d.name}" excluída.`, 'success');
+  };
+  openModal('modal-confirm');
+}
+
+// ========================
+// CRUD — AULAS
+// ========================
+let _pendingAulaDiscId = null;
+let _pendingAulaId = null;
+
+function openAddAulaModal() {
+  if (!_currentPanelDiscId) return;
+  const d = disciplines.find(x => x.id === _currentPanelDiscId);
+  if (!d) return;
+  document.getElementById('modal-add-aula-subtitle').textContent = `Adicionar aula a: ${d.name}`;
+  document.getElementById('naula-title').value = '';
+  openModal('modal-add-aula');
+  setTimeout(() => document.getElementById('naula-title').focus(), 200);
+}
+
+function confirmAddAula() {
+  const title = document.getElementById('naula-title').value.trim();
+  if (!title) { showToast('Informe o título da aula.','error'); return; }
+  const d = disciplines.find(x => x.id === _currentPanelDiscId);
+  if (!d) return;
+  const maxId = d.aulas.reduce((max, a) => Math.max(max, a.id||0), 0);
+  d.aulas.push({ id: maxId + 1, title, files: [] });
+  closeModal('modal-add-aula');
+  // Refresh panel
+  document.getElementById('panel-body').innerHTML = buildPanelBody(d);
+  showToast('Aula adicionada com sucesso!', 'success');
+}
+
+function openDeleteAulaModal(discId, aulaId) {
+  _pendingAulaDiscId = discId;
+  _pendingAulaId = aulaId;
+  const d = disciplines.find(x => x.id === discId);
+  const a = d && d.aulas.find(x => x.id === aulaId);
+  if (!a) return;
+  document.getElementById('modal-confirm-title').textContent = 'Excluir Aula';
+  document.getElementById('modal-confirm-subtitle').textContent = d.code + ' — ' + d.name;
+  document.getElementById('modal-confirm-msg').innerHTML =
+    `Tem certeza que deseja excluir a aula <strong>"${a.title}"</strong>?`;
+  document.getElementById('modal-confirm-warn').textContent =
+    `${(a.files||[]).length} arquivo(s) vinculado(s) serão removidos permanentemente desta aula.`;
+  const okBtn = document.getElementById('modal-confirm-ok');
+  okBtn.onclick = () => {
+    d.aulas = d.aulas.filter(x => x.id !== aulaId);
+    closeModal('modal-confirm');
+    document.getElementById('panel-body').innerHTML = buildPanelBody(d);
+    showToast('Aula excluída com sucesso.', 'success');
+  };
+  openModal('modal-confirm');
+}
+
+function openRenameAulaModal(discId, aulaId) {
+  _pendingAulaDiscId = discId;
+  _pendingAulaId = aulaId;
+  const d = disciplines.find(x => x.id === discId);
+  const a = d && d.aulas.find(x => x.id === aulaId);
+  if (!a) return;
+  const inp = document.getElementById('rename-aula-input');
+  inp.value = a.title;
+  openModal('modal-rename-aula');
+  setTimeout(() => { inp.focus(); inp.select(); }, 200);
+}
+
+function confirmRenameAula() {
+  const newTitle = document.getElementById('rename-aula-input').value.trim();
+  if (!newTitle) { showToast('O título não pode estar vazio.','error'); return; }
+  const d = disciplines.find(x => x.id === _pendingAulaDiscId);
+  const a = d && d.aulas.find(x => x.id === _pendingAulaId);
+  if (!a) return;
+  a.title = newTitle;
+  closeModal('modal-rename-aula');
+  document.getElementById('panel-body').innerHTML = buildPanelBody(d);
+  showToast('Aula renomeada com sucesso!', 'success');
+}
+
+// ========================
+// MODAL HELPERS
+// ========================
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Close on backdrop click
+  el.onclick = (e) => { if (e.target === el) closeModal(id); };
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('open');
+  // Only restore scroll if no other modal/panel is open
+  const anyOpen = document.querySelector('.crud-overlay.open') ||
+                  document.getElementById('disc-panel').classList.contains('open');
+  if (!anyOpen) document.body.style.overflow = '';
+}
+
+// ========================
+// TOAST (reuse or create)
+// ========================
+function showToast(msg, type = 'success') {
+  // Remove existing
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
 }
 
 // ========================
