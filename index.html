@@ -2246,21 +2246,45 @@ function showToast(msg, type = 'success') {
 // ========================
 // BACKUP JSON DOWNLOAD
 // ========================
-function downloadBackup() {
+async function downloadBackup() {
+  const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+  const filename = `backup_ppac_${dateStr}.json`;
+
   const data = {
     backup_date: new Date().toISOString(),
     student: studentData || BACKUP_DATA.student,
     app: { disciplines: disciplines || BACKUP_DATA.disciplines }
   };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const json = JSON.stringify(data, null, 2);
+
+  // -- Tenta File System Access API (Chrome/Edge): abre diálogo "Salvar como"
+  // -- na pasta do projeto. O browser lembra a última pasta escolhida.
+  if (window.showSaveFilePicker) {
+    try {
+      const fh = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ description: 'Arquivo JSON', accept: { 'application/json': ['.json'] } }]
+      });
+      const writable = await fh.createWritable();
+      await writable.write(json);
+      await writable.close();
+      showToast(`💾 Backup salvo: ${fh.name}`, 'success');
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') return; // usuário cancelou
+      console.warn('showSaveFilePicker falhou, usando fallback:', e);
+    }
+  }
+
+  // -- Fallback para Safari / Firefox: download normal para pasta Downloads
+  const blob = new Blob([json], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-  a.download = `backup_ppac_${dateStr}.json`;
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('💾 Backup gerado com sucesso!', 'success');
+  showToast(`💾 Backup baixado: ${filename}`, 'success');
 }
 
 // ========================
