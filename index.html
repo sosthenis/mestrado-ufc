@@ -422,6 +422,59 @@ footer a:hover{text-decoration:underline;}
 .chat-footer .key-ok{color:var(--green);}
 .chat-footer .key-none{color:var(--amber);}
 
+/* DIRECT LINKS TAB */
+.direct-links{display:flex;flex-direction:column;gap:10px;padding:14px 16px;}
+.direct-link-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;border-radius:12px;border:none;cursor:pointer;
+  font-size:13px;font-weight:600;font-family:'Inter',sans-serif;
+  text-decoration:none;transition:.25s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+}
+.direct-link-btn:hover{transform:translateY(-2px);}
+.direct-link-btn .dlb-icon{
+  width:34px;height:34px;border-radius:8px;display:flex;
+  align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.direct-link-btn .dlb-info{text-align:left;flex:1;}
+.direct-link-btn .dlb-info strong{display:block;font-size:13px;}
+.direct-link-btn .dlb-info small{font-size:10px;opacity:.7;}
+.dlb-chatgpt{background:rgba(16,163,127,0.15);color:#10a37f;border:1px solid rgba(16,163,127,0.25);}
+.dlb-chatgpt:hover{background:rgba(16,163,127,0.25);box-shadow:0 6px 20px rgba(16,163,127,0.2);}
+.dlb-gemini{background:rgba(66,133,244,0.15);color:#4285F4;border:1px solid rgba(66,133,244,0.25);}
+.dlb-gemini:hover{background:rgba(66,133,244,0.25);box-shadow:0 6px 20px rgba(66,133,244,0.2);}
+.dlb-note{font-size:11px;color:var(--gray2);text-align:center;padding:4px 0 0;line-height:1.5;}
+
+/* INLINE KEY FORM */
+.key-form{
+  padding:10px 14px 12px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.015);
+  display:none;flex-direction:column;gap:6px;
+}
+.key-form.open{display:flex;}
+.key-form label{font-size:10px;color:var(--gray2);font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+.key-form-row{display:flex;gap:6px;}
+.key-form input{
+  flex:1;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px;padding:8px 12px;
+  color:var(--white);font-size:12px;
+  font-family:'Inter',sans-serif;outline:none;
+  transition:.2s;
+}
+.key-form input:focus{border-color:rgba(66,133,244,0.5);background:rgba(66,133,244,0.06);}
+.key-form input::placeholder{color:var(--gray2);font-size:11px;}
+.key-form-save{
+  padding:8px 14px;border-radius:8px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  border:none;color:#fff;font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:.2s;
+}
+.key-form-save:hover{filter:brightness(1.15);}
+.key-form-cancel{background:none;border:none;color:var(--gray2);font-size:11px;cursor:pointer;text-align:center;padding:2px 0;}
+.key-form-cancel:hover{color:var(--white);}
+
 /* FIREBASE STATUS BAR */
 .fb-status-bar{
   position:fixed;top:0;left:0;right:0;z-index:200;
@@ -647,31 +700,86 @@ body.has-status-bar nav{top:28px;}
     <h4><span class="ai-logo gemini" id="chat-logo">G</span> <span id="chat-head-title">Assistente Acadêmico</span></h4>
     <button class="chat-close" onclick="toggleChat()"><i class="fas fa-times"></i></button>
   </div>
-  <!-- MODEL SWITCHER -->
-  <div class="model-switcher">
-    <button class="model-btn gemini active" onclick="switchModel('gemini')">
-      <i class="fab fa-google"></i> Gemini <span class="free-tag">GRÁTIS</span>
+
+  <!-- MODE TABS: API / DIRETO -->
+  <div class="model-switcher" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+    <button class="model-btn gemini active" id="tab-api-btn" onclick="switchChatTab('api')">
+      <i class="fas fa-robot"></i> Via API
     </button>
-    <button class="model-btn openai" onclick="switchModel('openai')">
-      <i class="fas fa-bolt"></i> GPT (OpenAI)
+    <button class="model-btn" id="tab-direct-btn" onclick="switchChatTab('direct')" style="color:var(--gray2);">
+      <i class="fas fa-external-link-alt"></i> Acesso Direto
     </button>
   </div>
-  <div class="chat-body" id="chat-body">
-    <div class="chat-msg bot">👋 Oi! Sou seu assistente acadêmico do mestrado <strong>PPAC — UFC</strong>.
 
-<strong>🟢 Gemini (Google)</strong> — <em>Grátis!</em> Gere sua key em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue3)">aistudio.google.com</a>
+  <!-- TAB: API MODE -->
+  <div id="chat-tab-api">
+    <!-- ENGINE SWITCHER -->
+    <div class="model-switcher" style="padding:6px 12px;">
+      <button class="model-btn gemini active" id="engine-gemini" onclick="switchModel('gemini')">
+        <i class="fab fa-google"></i> Gemini <span class="free-tag">GRÁTIS</span>
+      </button>
+      <button class="model-btn openai" id="engine-openai" onclick="switchModel('openai')">
+        <i class="fas fa-bolt"></i> GPT (OpenAI)
+      </button>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="chat-msg bot">👋 Oi! Sou seu assistente acadêmico do mestrado <strong>PPAC — UFC</strong>.
 
-<strong>⚡ GPT (OpenAI)</strong> — Alternativa paga. Use sua key em <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue3)">platform.openai.com</a>
+<strong>🟢 Gemini</strong> — <em>Grátis!</em> Gere key em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue3)">aistudio.google.com/apikey</a>
 
-Escolha o modelo acima e configure a key (uma vez só). Cada aluno usa sua própria conta — <strong>sem custo para você!</strong></div>
+<strong>⚡ GPT</strong> — Pago. Key em <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue3)">platform.openai.com</a>
+
+Sem API? Use a aba <strong>Acesso Direto →</strong></div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chat-input" placeholder="Pergunte algo sobre o mestrado..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()" id="chat-send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+    <!-- INLINE KEY FORM -->
+    <div class="key-form" id="key-form">
+      <label id="key-form-label">Cole sua API key Gemini (AIza...)</label>
+      <div class="key-form-row">
+        <input type="password" id="key-form-input" placeholder="AIzaSy...">
+        <button class="key-form-save" onclick="saveKeyInline()">Salvar</button>
+      </div>
+      <button class="key-form-cancel" onclick="closeKeyForm()">Cancelar</button>
+    </div>
+    <div class="chat-footer">
+      <a onclick="configChatKey()" id="chat-key-status"><i class="fas fa-key"></i> Configurar API key</a>
+      <span id="chat-model-label" style="font-size:9px;color:var(--gray2);">Gemini 2.0 Flash</span>
+    </div>
   </div>
-  <div class="chat-input-area">
-    <input type="text" id="chat-input" placeholder="Pergunte algo sobre o mestrado..." onkeydown="if(event.key==='Enter')sendChat()">
-    <button onclick="sendChat()" id="chat-send"><i class="fas fa-paper-plane"></i></button>
-  </div>
-  <div class="chat-footer">
-    <a onclick="configChatKey()" id="chat-key-status"><i class="fas fa-key"></i> Configurar API key</a>
-    <span id="chat-model-label" style="font-size:9px;color:var(--gray2);">Gemini 2.0 Flash</span>
+
+  <!-- TAB: DIRECT ACCESS -->
+  <div id="chat-tab-direct" style="display:none;">
+    <div class="direct-links">
+      <p style="font-size:12px;color:var(--gray);margin:0 0 4px;">Abre o chat no site oficial — sem API key. Seu prompt do PPAC já vai preenchido.</p>
+      <a class="direct-link-btn dlb-chatgpt" href="#" onclick="openDirectChat('chatgpt')" target="_blank">
+        <span class="dlb-icon" style="background:rgba(16,163,127,0.2);">&#129302;</span>
+        <span class="dlb-info">
+          <strong>ChatGPT (OpenAI)</strong>
+          <small>Abre chatgpt.com com prompt do PPAC</small>
+        </span>
+        <i class="fas fa-arrow-right" style="opacity:.5;font-size:12px;"></i>
+      </a>
+      <a class="direct-link-btn dlb-gemini" href="#" onclick="openDirectChat('gemini')" target="_blank">
+        <span class="dlb-icon" style="background:rgba(66,133,244,0.2);"><i class="fab fa-google" style="font-size:16px;"></i></span>
+        <span class="dlb-info">
+          <strong>Gemini (Google)</strong>
+          <small>Abre gemini.google.com com prompt do PPAC</small>
+        </span>
+        <i class="fas fa-arrow-right" style="opacity:.5;font-size:12px;"></i>
+      </a>
+      <a class="direct-link-btn" style="background:rgba(139,92,246,0.12);color:#8B5CF6;border:1px solid rgba(139,92,246,0.2);" href="https://notebooklm.google.com/" target="_blank">
+        <span class="dlb-icon" style="background:rgba(139,92,246,0.15);"><i class="fas fa-brain" style="font-size:16px;"></i></span>
+        <span class="dlb-info">
+          <strong>NotebookLM</strong>
+          <small>Pesquisa com seus documentos do mestrado</small>
+        </span>
+        <i class="fas fa-arrow-right" style="opacity:.5;font-size:12px;"></i>
+      </a>
+      <p class="dlb-note">Cada site usa sua própria conta Google/OpenAI.<br>Seus dados ficam <strong>privados</strong> e sem custo extra.</p>
+    </div>
   </div>
 </div>
 
@@ -1168,9 +1276,10 @@ function toggleChat() {
 function switchModel(model) {
   currentModel = model;
   localStorage.setItem('ppac_chat_model', model);
-  // Update buttons
-  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.model-btn.${model}`).classList.add('active');
+  // Update engine buttons only
+  document.querySelectorAll('#engine-gemini,#engine-openai').forEach(b => b.classList.remove('active'));
+  const engBtn = document.getElementById(`engine-${model}`);
+  if (engBtn) engBtn.classList.add('active');
   // Update header
   const logo = document.getElementById('chat-logo');
   const title = document.getElementById('chat-head-title');
@@ -1198,21 +1307,35 @@ function getKey(model) {
 }
 
 function configChatKey() {
-  const current = getKey();
   const isGemini = currentModel === 'gemini';
   const provider = isGemini ? 'Google Gemini' : 'OpenAI';
-  const url = isGemini ? 'https://aistudio.google.com/apikey' : 'https://platform.openai.com/api-keys';
-  const prefix = isGemini ? 'AIza' : 'sk-';
-  const msg = current
-    ? `Sua API key ${provider} está configurada (${current.slice(0, 8)}...).\n\nDeseja alterar? Cole a nova key ou cancele.`
-    : `Cole sua API key ${provider} (começa com ${prefix}...).\n\n${isGemini ? '🆓 GRÁTIS! ' : ''}Obtenha em: ${url}`;
-  const key = prompt(msg, '');
-  if (key !== null && key.trim()) {
-    const storageKey = isGemini ? 'ppac_gemini_key' : 'ppac_openai_key';
-    localStorage.setItem(storageKey, key.trim());
-    updateKeyStatus();
-    addBotMsg(`✅ API key ${provider} configurada! Agora pode me perguntar o que quiser.`);
-  }
+  const prefix = isGemini ? 'AIzaSy...' : 'sk-...';
+  const lbl = document.getElementById('key-form-label');
+  const inp = document.getElementById('key-form-input');
+  const form = document.getElementById('key-form');
+  if (!form) return;
+  if (lbl) lbl.textContent = `Cole sua API key ${provider} (${prefix})`;
+  if (inp) { inp.value = ''; inp.placeholder = prefix; }
+  form.classList.add('open');
+  setTimeout(() => { if (inp) inp.focus(); }, 100);
+}
+
+function saveKeyInline() {
+  const inp = document.getElementById('key-form-input');
+  const key = (inp?.value || '').trim();
+  if (!key) { inp?.focus(); return; }
+  const isGemini = currentModel === 'gemini';
+  const storageKey = isGemini ? 'ppac_gemini_key' : 'ppac_openai_key';
+  localStorage.setItem(storageKey, key);
+  closeKeyForm();
+  updateKeyStatus();
+  const provider = isGemini ? 'Google Gemini' : 'OpenAI';
+  addBotMsg(`✅ API key ${provider} salva! Agora pode me perguntar o que quiser.`);
+}
+
+function closeKeyForm() {
+  const form = document.getElementById('key-form');
+  if (form) form.classList.remove('open');
 }
 
 function updateKeyStatus() {
@@ -1224,6 +1347,44 @@ function updateKeyStatus() {
   } else {
     el.innerHTML = `<span class="key-none"><i class="fas fa-key"></i> Configurar key ${provider}</span>`;
   }
+}
+
+// ---- CHAT TABS (API / Direct) ----
+function switchChatTab(tab) {
+  const apiDiv = document.getElementById('chat-tab-api');
+  const dirDiv = document.getElementById('chat-tab-direct');
+  const apiBtn = document.getElementById('tab-api-btn');
+  const dirBtn = document.getElementById('tab-direct-btn');
+  if (tab === 'api') {
+    apiDiv.style.display = '';
+    dirDiv.style.display = 'none';
+    apiBtn.classList.add('active','gemini');
+    dirBtn.classList.remove('active','gemini');
+    dirBtn.style.color = 'var(--gray2)';
+  } else {
+    apiDiv.style.display = 'none';
+    dirDiv.style.display = '';
+    dirBtn.classList.add('active');
+    dirBtn.style.color = '';
+    apiBtn.classList.remove('active','gemini');
+  }
+}
+
+// ---- OPEN DIRECT CHAT with PPAC context ----
+function openDirectChat(engine) {
+  const prompt = encodeURIComponent(
+    'Olá! Preciso de ajuda com o Mestrado Profissional em Administração e Controladoria (PPAC PROF) da UFC/FEAAC — Turma COGERH 2026.1. ' +
+    'As disciplinas são: Teoria das Organizações (EDP704A), Metodologia de Pesquisa (EDP705A) e Controladoria (EHP713A). ' +
+    'Por favor, responda sempre em português brasileiro com linguagem acadêmica. '
+  );
+  let url;
+  if (engine === 'chatgpt') {
+    url = `https://chatgpt.com/?q=${prompt}`;
+  } else {
+    url = `https://gemini.google.com/app?q=${prompt}`;
+  }
+  window.open(url, '_blank');
+  return false;
 }
 
 // ---- MESSAGE HELPERS ----
