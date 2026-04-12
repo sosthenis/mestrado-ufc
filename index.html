@@ -253,25 +253,63 @@ footer a:hover{text-decoration:underline;}
 .toast.error{border-color:rgba(239,68,68,0.4);color:var(--red);}
 
 /* ======================== */
-/* CHATBOT AI — GLASS FAB   */
+/* CHATBOT AI — AVATAR FAB  */
 /* ======================== */
+@keyframes fabFloat{
+  0%,100%{transform:translateY(0px);}
+  50%{transform:translateY(-8px);}
+}
+@keyframes fabGlow{
+  0%,100%{box-shadow:0 6px 30px rgba(66,133,244,0.35),0 0 0 0 rgba(66,133,244,0.3);}
+  50%{box-shadow:0 12px 40px rgba(66,133,244,0.5),0 0 0 12px rgba(66,133,244,0);}
+}
+@keyframes ringPulse{
+  0%{transform:scale(1);opacity:.6;}
+  100%{transform:scale(1.7);opacity:0;}
+}
 .chat-fab{
   position:fixed;bottom:32px;right:32px;z-index:90;
-  width:60px;height:60px;border-radius:50%;
-  background:linear-gradient(135deg,#4285F4,#34A853);
-  border:none;color:#fff;font-size:24px;cursor:pointer;
-  box-shadow:0 6px 30px rgba(66,133,244,0.4),0 0 40px rgba(52,168,83,0.15);
-  transition:.35s cubic-bezier(.4,0,.2,1);
-  display:flex;align-items:center;justify-content:center;
+  width:70px;height:70px;border-radius:50%;
+  background:transparent;
+  border:none;cursor:pointer;padding:0;
+  animation:fabFloat 3s ease-in-out infinite;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.chat-fab::before{
+  content:'';
+  position:absolute;inset:0;border-radius:50%;
+  border:2px solid rgba(66,133,244,0.6);
+  animation:ringPulse 2s ease-out infinite;
+  pointer-events:none;
+}
+.chat-fab::after{
+  content:'';
+  position:absolute;inset:0;border-radius:50%;
+  border:2px solid rgba(52,168,83,0.4);
+  animation:ringPulse 2s ease-out infinite .6s;
+  pointer-events:none;
 }
 .chat-fab:hover{
-  transform:scale(1.15) rotate(15deg);
-  box-shadow:0 10px 50px rgba(66,133,244,0.5),0 0 60px rgba(52,168,83,0.25);
+  animation:none;
+  transform:scale(1.12);
+}
+.chat-fab .fab-avatar{
+  width:70px;height:70px;border-radius:50%;
+  object-fit:cover;object-position:top;
+  border:3px solid rgba(255,255,255,0.15);
+  box-shadow:0 8px 32px rgba(66,133,244,0.45),0 2px 8px rgba(0,0,0,0.4);
+  display:block;
+  transition:box-shadow .3s;
+}
+.chat-fab:hover .fab-avatar{
+  box-shadow:0 12px 48px rgba(66,133,244,0.7),0 4px 12px rgba(0,0,0,0.5);
+  border-color:rgba(255,255,255,0.35);
 }
 .chat-fab .fab-badge{
-  position:absolute;top:-2px;right:-2px;width:14px;height:14px;
+  position:absolute;top:2px;right:2px;width:14px;height:14px;
   background:#10B981;border-radius:50%;border:2px solid var(--navy);
   animation:blink 1.5s infinite;
+  z-index:2;
 }
 
 /* CHAT PANEL */
@@ -507,15 +545,64 @@ footer a:hover{text-decoration:underline;}
 .fb-status-bar.hidden{opacity:0;}
 body.has-status-bar nav{top:28px;}
 
+/* HAMBURGER + MOBILE MENU */
+.hamburger{
+  display:none;flex-direction:column;gap:5px;
+  background:none;border:none;cursor:pointer;
+  padding:8px;border-radius:8px;z-index:200;transition:.2s;
+}
+.hamburger:hover{background:rgba(255,255,255,0.08);}
+.hamburger span{
+  display:block;width:24px;height:2px;border-radius:2px;
+  background:#fff;transition:.3s cubic-bezier(.4,0,.2,1);
+  transform-origin:center;
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.mobile-menu{
+  display:none;position:fixed;
+  top:64px;left:0;right:0;z-index:99;
+  background:rgba(11,22,35,0.98);
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+  flex-direction:column;padding:8px 0 20px;
+}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{
+  color:var(--gray);text-decoration:none;
+  font-size:15px;font-weight:500;
+  padding:16px 24px;
+  display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  transition:.2s;
+}
+.mobile-menu a:hover,.mobile-menu a:active{
+  background:rgba(79,195,247,0.08);color:#fff;
+}
+.mobile-menu a:last-child{border-bottom:none;}
+.mobile-menu .mmenu-notebook{
+  margin:12px 16px 0;border-radius:10px;
+  border-bottom:none!important;
+  background:linear-gradient(135deg,#4285F4,#34A853,#FBBC05,#EA4335);
+  background-size:300% 300%;animation:gradShift 4s ease infinite;
+  color:#fff!important;font-weight:700!important;
+  box-shadow:0 2px 12px rgba(66,133,244,0.4);
+}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .student-card{grid-template-columns:1fr 1fr;}
-  .nav-links{display:none;}
+  .nav-links{display:none!important;}
+  .hamburger{display:flex!important;}
   .hero-stats{gap:1.5rem;}
   .grid3{grid-template-columns:1fr;}
   .aula-title{font-size:12px;}
   .chat-panel{width:calc(100vw - 32px);right:16px;bottom:90px;max-height:70vh;}
-  .chat-fab{bottom:20px;right:20px;width:52px;height:52px;font-size:20px;}
+  .chat-fab{bottom:20px;right:20px;}
+  .fab-avatar,.chat-fab{width:56px!important;height:56px!important;}
 }
 @media(max-width:480px){
   .student-card{grid-template-columns:1fr;}
@@ -531,12 +618,13 @@ body.has-status-bar nav{top:28px;}
 </div>
 
 <!-- NAV -->
-<nav>
+<nav id="main-nav">
   <div class="nav-inner">
     <div class="logo-box">
       <div class="logo-ufc">UFC</div>
       <h1>Mestrado Profissional<br><span style="font-weight:700;color:var(--blue3);text-transform:uppercase;font-size:11px;">Adm e Controladoria (PPAC PROF)</span></h1>
     </div>
+    <!-- Desktop nav links -->
     <div class="nav-links">
       <a href="#perfil"><i class="fas fa-user-graduate"></i> Perfil</a>
       <a href="#progresso"><i class="fas fa-chart-line"></i> Progresso</a>
@@ -545,8 +633,22 @@ body.has-status-bar nav{top:28px;}
         <i class="fas fa-brain"></i> NotebookLM
       </a>
     </div>
+    <!-- Mobile hamburger -->
+    <button class="hamburger" id="hamburger-btn" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- MOBILE MENU DROPDOWN -->
+<div class="mobile-menu" id="mobile-menu" role="navigation">
+  <a href="#perfil" onclick="closeMenu()"><i class="fas fa-user-graduate" style="color:var(--blue3);width:20px;"></i> Perfil</a>
+  <a href="#progresso" onclick="closeMenu()"><i class="fas fa-chart-line" style="color:var(--blue3);width:20px;"></i> Progresso</a>
+  <a href="#disciplinas" onclick="closeMenu()"><i class="fas fa-book-open" style="color:var(--blue3);width:20px;"></i> Disciplinas</a>
+  <a href="https://notebooklm.google.com/" target="_blank" class="mmenu-notebook" onclick="closeMenu()">
+    <i class="fas fa-brain"></i> NotebookLM
+  </a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -689,8 +791,56 @@ body.has-status-bar nav{top:28px;}
 </div>
 
 <!-- BOT AI FAB -->
-<button class="chat-fab" onclick="toggleChat()" title="Assistente IA Acadêmico" id="chat-fab-btn">
-  <i class="fas fa-robot"></i>
+<button class="chat-fab" onclick="toggleChat()" title="Assistente PPAC" id="chat-fab-btn">
+  <img class="fab-avatar" src="bot-avatar.png"
+    onerror="this.onerror=null;this.style.display='none';document.getElementById('fab-fallback').style.display='flex';"
+    alt="Assistente PPAC" id="fab-avatar-img">
+  <!-- Rich SVG fallback avatar — student with glasses & book -->
+  <div id="fab-fallback" style="display:none;width:70px;height:70px;border-radius:50%;overflow:hidden;box-shadow:0 8px 32px rgba(66,133,244,0.5);cursor:pointer;flex-shrink:0;">
+    <svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#1a4a8a"/>
+          <stop offset="100%" stop-color="#0b1623"/>
+        </radialGradient>
+        <radialGradient id="skin" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fad0a0"/>
+          <stop offset="100%" stop-color="#e8a870"/>
+        </radialGradient>
+      </defs>
+      <!-- Background -->
+      <circle cx="35" cy="35" r="35" fill="url(#bg)"/>
+      <!-- Neck -->
+      <rect x="29" y="40" width="12" height="10" rx="3" fill="url(#skin)"/>
+      <!-- Shirt/Tie -->
+      <ellipse cx="35" cy="62" rx="18" ry="14" fill="#1e3a6a"/>
+      <rect x="33" y="48" width="4" height="12" rx="2" fill="#4285F4"/>
+      <!-- Head -->
+      <ellipse cx="35" cy="30" rx="14" ry="15" fill="url(#skin)"/>
+      <!-- Hair -->
+      <ellipse cx="35" cy="17" rx="14" ry="8" fill="#4a2e0a"/>
+      <ellipse cx="35" cy="14" rx="12" ry="6" fill="#3a2008"/>
+      <!-- Eyes -->
+      <circle cx="29.5" cy="29" r="3.5" fill="#fff"/>
+      <circle cx="40.5" cy="29" r="3.5" fill="#fff"/>
+      <circle cx="30" cy="29.5" r="2" fill="#2a1a00"/>
+      <circle cx="41" cy="29.5" r="2" fill="#2a1a00"/>
+      <circle cx="30.8" cy="29" r="0.7" fill="#fff"/>
+      <circle cx="41.8" cy="29" r="0.7" fill="#fff"/>
+      <!-- Glasses -->
+      <rect x="25" y="26.5" width="9" height="6" rx="3" fill="none" stroke="#555" stroke-width="1.2"/>
+      <rect x="36" y="26.5" width="9" height="6" rx="3" fill="none" stroke="#555" stroke-width="1.2"/>
+      <line x1="34" y1="29.5" x2="36" y2="29.5" stroke="#555" stroke-width="1.2"/>
+      <line x1="24" y1="29" x2="22" y2="28" stroke="#555" stroke-width="1"/>
+      <line x1="45" y1="29" x2="47" y2="28" stroke="#555" stroke-width="1"/>
+      <!-- Smile -->
+      <path d="M30 34 Q35 38 40 34" fill="none" stroke="#c0785a" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Book -->
+      <rect x="42" y="52" width="10" height="13" rx="1" fill="#c0392b"/>
+      <rect x="43" y="53" width="8" height="11" rx="1" fill="#e74c3c"/>
+      <line x1="47" y1="53" x2="47" y2="64" stroke="#fff" stroke-width="0.8" opacity="0.5"/>
+    </svg>
+  </div>
   <span class="fab-badge"></span>
 </button>
 
@@ -757,8 +907,8 @@ Sem API? Use a aba <strong>Acesso Direto →</strong></div>
       <a class="direct-link-btn dlb-chatgpt" href="#" onclick="openDirectChat('chatgpt')" target="_blank">
         <span class="dlb-icon" style="background:rgba(16,163,127,0.2);">&#129302;</span>
         <span class="dlb-info">
-          <strong>ChatGPT (OpenAI)</strong>
-          <small>Abre chatgpt.com com prompt do PPAC</small>
+          <strong>Assistente PPAC (ChatGPT)</strong>
+          <small>GPT personalizado para o seu mestrado</small>
         </span>
         <i class="fas fa-arrow-right" style="opacity:.5;font-size:12px;"></i>
       </a>
@@ -1210,6 +1360,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ========================
+// MOBILE HAMBURGER MENU
+// ========================
+function toggleMenu() {
+  const btn = document.getElementById('hamburger-btn');
+  const menu = document.getElementById('mobile-menu');
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) {
+    closeMenu();
+  } else {
+    menu.classList.add('open');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function closeMenu() {
+  const btn = document.getElementById('hamburger-btn');
+  const menu = document.getElementById('mobile-menu');
+  menu.classList.remove('open');
+  btn.classList.remove('open');
+  btn.setAttribute('aria-expanded', 'false');
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', e => {
+  const menu = document.getElementById('mobile-menu');
+  const btn = document.getElementById('hamburger-btn');
+  if (menu && menu.classList.contains('open')) {
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+      closeMenu();
+    }
+  }
+});
+
+// ========================
 // FIREBASE STATUS BAR
 // ========================
 function checkFirebaseConnection() {
@@ -1379,7 +1564,7 @@ function openDirectChat(engine) {
   );
   let url;
   if (engine === 'chatgpt') {
-    url = `https://chatgpt.com/?q=${prompt}`;
+    url = 'https://chatgpt.com/g/g-p-69d7197f09d48191bf754d9dfc32ee9e-assistente-ppac/project';
   } else {
     url = `https://gemini.google.com/app?q=${prompt}`;
   }
