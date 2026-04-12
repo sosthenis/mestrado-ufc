@@ -2328,30 +2328,77 @@ async function downloadBackup() {
   };
   const json = JSON.stringify(data, null, 2);
 
-  // --- try directory-based save (remembered folder) ---
-  try {
-    const dir = await _getBackupDir();
-    if (dir) {
-      const fileHandle = await dir.getFileHandle(filename, { create: true });
-      const writable   = await fileHandle.createWritable();
-      await writable.write(json);
-      await writable.close();
-      await _refreshBackupLabel();
-      showToast(`💾 Backup salvo em "${dir.name}/${filename}"`, 'success');
-      return;
+  // --- Chrome / Edge: directory picker (remembered folder) ---
+  if (window.showDirectoryPicker) {
+    try {
+      const dir = await _getBackupDir();
+      if (dir) {
+        const fileHandle = await dir.getFileHandle(filename, { create: true });
+        const writable   = await fileHandle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        await _refreshBackupLabel();
+        showToast(`\ud83d\udcbe Backup salvo em "${dir.name}/${filename}"`, 'success');
+        return;
+      }
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+      console.warn('Directory backup failed:', e);
     }
-  } catch(e) {
-    if (e.name === 'AbortError') return;
-    console.warn('Directory backup failed, using fallback:', e);
   }
 
-  // --- fallback: classic download ---
+  // --- Safari / Firefox: faz o download E exibe instrução (se ainda não configurado) ---
   const blob = new Blob([json], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
-  showToast(`💾 Backup baixado: ${filename}`, 'success');
+
+  // Mostra instrução de configuração do Safari (somente 1x por sessão)
+  if (!sessionStorage.getItem('safari_dl_tip_shown') && !window.showDirectoryPicker) {
+    sessionStorage.setItem('safari_dl_tip_shown', '1');
+    _showSafariBackupTip(filename);
+  } else {
+    showToast(`\ud83d\udcbe Backup em Downloads: ${filename}`, 'success');
+  }
+}
+
+function _showSafariBackupTip(filename) {
+  // Remove tip anterior se houver
+  document.getElementById('safari-backup-tip')?.remove();
+
+  const tip = document.createElement('div');
+  tip.id = 'safari-backup-tip';
+  tip.style.cssText = `
+    position:fixed;bottom:24px;right:24px;z-index:9999;
+    background:#162640;border:1px solid rgba(79,195,247,0.3);
+    border-radius:14px;padding:20px 22px;max-width:360px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.5);
+    font-family:'Inter',sans-serif;font-size:13px;color:#e8f0fa;
+    animation:slideIn .35s ease;
+  `;
+  tip.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <i class="fas fa-info-circle" style="color:#4fc3f7;font-size:18px;"></i>
+      <strong style="font-size:14px;">Configurar pasta de backup</strong>
+      <button onclick="document.getElementById('safari-backup-tip').remove()"
+        style="margin-left:auto;background:none;border:none;color:#8ba3bf;cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <p style="color:#8ba3bf;line-height:1.7;margin:0 0 12px;">
+      Arquivo <strong style="color:#e8f0fa;">${filename}</strong> salvo em <strong style="color:#f59e0b;">Downloads</strong>.<br>
+      No <strong style="color:#e8f0fa;">Safari</strong>, configure a pasta de download para sempre salvar na pasta do projeto:
+    </p>
+    <ol style="color:#8ba3bf;line-height:2;margin:0 0 14px;padding-left:18px;">
+      <li>Abra <strong style="color:#e8f0fa;">Safari → Ajustes (⌘,)</strong></li>
+      <li>Aba <strong style="color:#e8f0fa;">Geral</strong></li>
+      <li><em>Local dos downloads do arquivo</em> → <strong style="color:#4fc3f7;">Outro…</strong></li>
+      <li>Navegue até <strong style="color:#4fc3f7;">MESTRADO UFC 2</strong> e clique em <em>Selecionar</em></li>
+    </ol>
+    <p style="color:#4ade80;font-size:11px;margin:0;">
+      <i class="fas fa-check-circle"></i> Após isso, todos os backups já caem direto na pasta certa!
+    </p>
+  `;
+  document.body.appendChild(tip);
 }
 
 async function resetBackupFolder() {
