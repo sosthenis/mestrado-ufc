@@ -422,6 +422,38 @@ footer a:hover{text-decoration:underline;}
 .chat-footer .key-ok{color:var(--green);}
 .chat-footer .key-none{color:var(--amber);}
 
+/* FIREBASE STATUS BAR */
+.fb-status-bar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:28px;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:11px;font-weight:600;letter-spacing:.3px;
+  transition:background .4s,opacity .6s;
+  pointer-events:none;
+}
+.fb-status-bar.checking{
+  background:rgba(245,158,11,0.15);
+  border-bottom:1px solid rgba(245,158,11,0.25);
+  color:var(--amber);
+}
+.fb-status-bar.connected{
+  background:rgba(16,185,129,0.12);
+  border-bottom:1px solid rgba(16,185,129,0.2);
+  color:var(--green);
+}
+.fb-status-bar.error{
+  background:rgba(239,68,68,0.12);
+  border-bottom:1px solid rgba(239,68,68,0.2);
+  color:#f87171;
+}
+.fb-status-bar .fb-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+}
+.fb-status-bar.checking .fb-dot{background:var(--amber);animation:blink 1s infinite;}
+.fb-status-bar.connected .fb-dot{background:var(--green);}
+.fb-status-bar.error .fb-dot{background:#f87171;}
+.fb-status-bar.hidden{opacity:0;}
+body.has-status-bar nav{top:28px;}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .student-card{grid-template-columns:1fr 1fr;}
@@ -438,6 +470,12 @@ footer a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
+
+<!-- FIREBASE STATUS BAR -->
+<div class="fb-status-bar checking" id="fb-status-bar">
+  <span class="fb-dot"></span>
+  <span id="fb-status-text">Verificando conexão com a nuvem...</span>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -1058,7 +1096,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Init chat key status
   updateKeyStatus();
+
+  // Firebase connectivity check
+  checkFirebaseConnection();
 });
+
+// ========================
+// FIREBASE STATUS BAR
+// ========================
+function checkFirebaseConnection() {
+  const bar = document.getElementById('fb-status-bar');
+  const txt = document.getElementById('fb-status-text');
+  if (!bar || !txt) return;
+  document.body.classList.add('has-status-bar');
+
+  const fbBucket = 'mestrado-ppac.firebasestorage.app';
+  const testUrl = `https://firebasestorage.googleapis.com/v0/b/${fbBucket}/o?maxResults=1`;
+
+  fetch(testUrl, { method: 'GET', mode: 'cors' })
+    .then(res => {
+      // 401/403 = reached Firebase (auth required) = connected ✓
+      if (res.ok || res.status === 401 || res.status === 403) {
+        bar.className = 'fb-status-bar connected';
+        txt.textContent = '☁️ Conectado ao Firebase — materiais da nuvem disponíveis';
+        setTimeout(() => {
+          bar.classList.add('hidden');
+          document.body.classList.remove('has-status-bar');
+        }, 6000);
+      } else {
+        bar.className = 'fb-status-bar error';
+        txt.textContent = `⚠️ Firebase indisponível (${res.status}) — usando dados locais`;
+      }
+    })
+    .catch(() => {
+      bar.className = 'fb-status-bar error';
+      txt.textContent = '⚠️ Sem conexão com a nuvem — verifique sua internet';
+    });
+}
 
 // ========================
 // CHATBOT DUAL: Gemini (FREE) + OpenAI GPT
@@ -1222,13 +1296,35 @@ async function sendChat() {
     addBotMsg(reply);
   } catch (e) {
     hideTyping();
-    if (e.message.includes('401') || e.message.includes('INVALID')) {
-      addErrorMsg('API key inválida ou expirada. Clique abaixo para reconfigurar.');
+    const msg = (e.message || '').toLowerCase();
+    const isInvalidKey =
+      msg.includes('401') ||
+      msg.includes('api key not valid') ||
+      msg.includes('invalid api key') ||
+      msg.includes('api_key_invalid') ||
+      msg.includes('invalid') && msg.includes('key');
+    if (isInvalidKey) {
       const storageKey = currentModel === 'gemini' ? 'ppac_gemini_key' : 'ppac_openai_key';
+      const providerName = currentModel === 'gemini' ? 'Google Gemini' : 'OpenAI';
+      const keyUrl = currentModel === 'gemini'
+        ? 'aistudio.google.com/apikey'
+        : 'platform.openai.com/api-keys';
       localStorage.removeItem(storageKey);
       updateKeyStatus();
-    } else if (e.message.includes('429')) {
-      addErrorMsg('Limite de requisições atingido. Aguarde um momento e tente novamente.');
+      addErrorMsg(
+        `🔑 API key ${providerName} inválida!\n\n` +
+        `• Clique em "Configurar key ${providerName}" abaixo\n` +
+        `• Cole uma key válida de: ${keyUrl}\n` +
+        `• ${currentModel === 'gemini' ? 'Key começa com "AIza..."' : 'Key começa com "sk-..."'}`
+      );
+    } else if (msg.includes('429') || msg.includes('quota') || msg.includes('quota exceeded') || msg.includes('limit: 0')) {
+      addErrorMsg(
+        '⏱️ Cota Gemini esgotada!\n\n' +
+        'Isso ocorre quando a chave usa a conta Google Workspace/Escola.\n\n' +
+        '✅ Solução: Crie uma key PESSOAL em aistudio.google.com/apikey\n' +
+        '   usando sua conta Google pessoal (gmail.com)\n\n' +
+        'Ou clique em "GPT (OpenAI)" para usar o outro motor.'
+      );
     } else {
       addErrorMsg(`Erro: ${e.message}`);
     }
@@ -1241,14 +1337,20 @@ async function sendChat() {
   input.focus();
 }
 
-// ---- GEMINI API (FREE) ----
+// ---- GEMINI API (FREE) — with automatic model fallback ----
+// Try models in order until one works (quota may differ per model)
+const GEMINI_MODELS = [
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b'
+];
+let geminiModelIndex = parseInt(localStorage.getItem('ppac_gemini_model_idx') || '0');
+
 async function callGemini(key, userText) {
-  // Build conversation for Gemini
+  // Build conversation contents
   const contents = [];
-  // System instruction goes as first user+model exchange
   contents.push({ role: 'user', parts: [{ text: CHAT_SYSTEM_PROMPT }] });
   contents.push({ role: 'model', parts: [{ text: 'Entendido! Sou o assistente acadêmico do PPAC. Como posso ajudar?' }] });
-  // Add history
   chatHistory.slice(-18).forEach(m => {
     contents.push({
       role: m.role === 'user' ? 'user' : 'model',
@@ -1256,30 +1358,59 @@ async function callGemini(key, userText) {
     });
   });
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1024
+  // Try each model starting from last working one
+  let lastErr;
+  for (let i = geminiModelIndex; i < GEMINI_MODELS.length; i++) {
+    const model = GEMINI_MODELS[i];
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents,
+            generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+          })
         }
-      })
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Save working model index
+        if (i !== geminiModelIndex) {
+          geminiModelIndex = i;
+          localStorage.setItem('ppac_gemini_model_idx', String(i));
+          // Update label
+          const lbl = document.getElementById('chat-model-label');
+          if (lbl) lbl.textContent = model;
+          addBotMsg(`ℹ️ Usando ${model} (cota do modelo anterior esgotada).`);
+        }
+        hideTyping();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text
+          || 'Desculpe, não consegui processar sua pergunta.';
+      }
+
+      const errData = await response.json().catch(() => ({}));
+      const errMsg = (errData.error?.message || `${response.status}`).toLowerCase();
+      const isQuota = response.status === 429 || errMsg.includes('quota') || errMsg.includes('limit: 0');
+
+      if (isQuota && i < GEMINI_MODELS.length - 1) {
+        // Quota on this model — try next
+        console.warn(`Gemini ${model} quota exceeded, trying next model...`);
+        lastErr = new Error(`QUOTA:${errData.error?.message || response.status}`);
+        continue;
+      }
+      lastErr = new Error(errData.error?.message || `Erro ${response.status}`);
+      break;
+    } catch (netErr) {
+      lastErr = netErr;
+      break;
     }
-  );
-
-  hideTyping();
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Erro ${response.status}`);
   }
 
-  const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Desculpe, não consegui processar sua pergunta.';
+  hideTyping();
+  throw lastErr || new Error('Todos os modelos Gemini falharam.');
 }
 
 // ---- OPENAI API ----
