@@ -1012,11 +1012,19 @@ body.has-status-bar nav{top:28px;}
       <i class="fas fa-book-open"></i> Disciplinas
       <span style="background:rgba(79,195,247,0.15);color:var(--blue3);font-size:12px;padding:3px 10px;border-radius:50px;font-weight:700;" id="disc-count">6</span>
     </div>
-    <button class="panel-action-btn" onclick="openAddDisciplineModal()"
-      style="background:rgba(79,195,247,0.1);color:var(--blue3);border:1px solid rgba(79,195,247,0.2);font-size:12px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:7px;"
-      onmouseover="this.style.background='rgba(79,195,247,0.22)'" onmouseout="this.style.background='rgba(79,195,247,0.1)'">
-      <i class="fas fa-plus"></i> Nova Disciplina
-    </button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="panel-action-btn" onclick="downloadBackup()"
+        title="Baixar backup JSON com todos os dados atuais"
+        style="background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);font-size:12px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:7px;"
+        onmouseover="this.style.background='rgba(16,185,129,0.22)'" onmouseout="this.style.background='rgba(16,185,129,0.1)'">
+        <i class="fas fa-shield-alt"></i> Backup
+      </button>
+      <button class="panel-action-btn" onclick="openAddDisciplineModal()"
+        style="background:rgba(79,195,247,0.1);color:var(--blue3);border:1px solid rgba(79,195,247,0.2);font-size:12px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:7px;"
+        onmouseover="this.style.background='rgba(79,195,247,0.22)'" onmouseout="this.style.background='rgba(79,195,247,0.1)'">
+        <i class="fas fa-plus"></i> Nova Disciplina
+      </button>
+    </div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('todas',this)">Todas</button>
@@ -2233,6 +2241,26 @@ function showToast(msg, type = 'success') {
   t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
+}
+
+// ========================
+// BACKUP JSON DOWNLOAD
+// ========================
+function downloadBackup() {
+  const data = {
+    backup_date: new Date().toISOString(),
+    student: studentData || BACKUP_DATA.student,
+    app: { disciplines: disciplines || BACKUP_DATA.disciplines }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+  a.download = `backup_ppac_${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('💾 Backup gerado com sucesso!', 'success');
 }
 
 // ========================
