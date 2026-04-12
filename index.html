@@ -252,6 +252,176 @@ footer a:hover{text-decoration:underline;}
 .toast.success{border-color:rgba(16,185,129,0.4);color:var(--green);}
 .toast.error{border-color:rgba(239,68,68,0.4);color:var(--red);}
 
+/* ======================== */
+/* CHATBOT AI — GLASS FAB   */
+/* ======================== */
+.chat-fab{
+  position:fixed;bottom:32px;right:32px;z-index:90;
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#4285F4,#34A853);
+  border:none;color:#fff;font-size:24px;cursor:pointer;
+  box-shadow:0 6px 30px rgba(66,133,244,0.4),0 0 40px rgba(52,168,83,0.15);
+  transition:.35s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;justify-content:center;
+}
+.chat-fab:hover{
+  transform:scale(1.15) rotate(15deg);
+  box-shadow:0 10px 50px rgba(66,133,244,0.5),0 0 60px rgba(52,168,83,0.25);
+}
+.chat-fab .fab-badge{
+  position:absolute;top:-2px;right:-2px;width:14px;height:14px;
+  background:#10B981;border-radius:50%;border:2px solid var(--navy);
+  animation:blink 1.5s infinite;
+}
+
+/* CHAT PANEL */
+.chat-panel{
+  display:none;position:fixed;bottom:100px;right:32px;z-index:300;
+  width:420px;max-height:600px;
+  background:rgba(11,22,35,0.96);
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  box-shadow:0 20px 80px rgba(0,0,0,0.6),0 0 40px rgba(66,133,244,0.08);
+  flex-direction:column;
+  overflow:hidden;
+  animation:slideIn .3s ease;
+}
+.chat-panel.open{display:flex;}
+
+.chat-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background:rgba(66,133,244,0.08);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.chat-head h4{
+  font-size:13px;font-weight:700;color:#fff;
+  display:flex;align-items:center;gap:8px;
+}
+.chat-head .ai-logo{
+  width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;
+}
+.chat-head .ai-logo.gemini{background:linear-gradient(135deg,#4285F4,#34A853);}
+.chat-head .ai-logo.openai{background:linear-gradient(135deg,#10a37f,#1a7f64);}
+.chat-close{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  color:var(--gray);cursor:pointer;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  transition:.2s;
+}
+.chat-close:hover{background:rgba(239,68,68,0.2);color:var(--red);border-color:var(--red);}
+
+/* MODEL SWITCHER */
+.model-switcher{
+  display:flex;gap:0;padding:8px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  background:rgba(255,255,255,0.015);
+}
+.model-btn{
+  flex:1;padding:7px 10px;border:none;
+  background:transparent;color:var(--gray2);
+  font-size:11px;font-weight:600;cursor:pointer;
+  border-radius:8px;transition:.25s;
+  font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.model-btn:hover{color:var(--white);background:rgba(255,255,255,0.04);}
+.model-btn.active{color:#fff;}
+.model-btn.active.gemini{background:rgba(66,133,244,0.2);box-shadow:0 0 12px rgba(66,133,244,0.15);}
+.model-btn.active.openai{background:rgba(16,163,127,0.2);box-shadow:0 0 12px rgba(16,163,127,0.15);}
+.model-btn .free-tag{font-size:8px;background:rgba(16,185,129,0.2);color:var(--green);padding:1px 5px;border-radius:4px;font-weight:700;letter-spacing:.3px;}
+
+.chat-body{
+  flex:1;overflow-y:auto;padding:14px 16px;
+  display:flex;flex-direction:column;gap:10px;
+  max-height:340px;min-height:200px;
+}
+
+.chat-msg{
+  max-width:90%;padding:11px 14px;
+  border-radius:14px;font-size:13px;line-height:1.7;
+  word-wrap:break-word;position:relative;
+  animation:slideIn .2s ease;
+}
+.chat-msg.bot{
+  background:rgba(66,133,244,0.1);
+  border:1px solid rgba(66,133,244,0.18);
+  color:var(--white);align-self:flex-start;
+  border-bottom-left-radius:4px;
+}
+.chat-msg.user{
+  background:rgba(79,195,247,0.12);
+  border:1px solid rgba(79,195,247,0.2);
+  color:var(--white);align-self:flex-end;
+  border-bottom-right-radius:4px;
+}
+.chat-msg.error{
+  background:rgba(239,68,68,0.1);
+  border:1px solid rgba(239,68,68,0.2);
+  color:#f87171;align-self:flex-start;
+  font-size:12px;
+}
+
+.chat-typing{
+  display:flex;gap:4px;padding:12px 16px;align-self:flex-start;
+}
+.chat-typing span{
+  width:7px;height:7px;border-radius:50%;background:rgba(66,133,244,0.5);
+  animation:typingDot 1.4s infinite;
+}
+.chat-typing span:nth-child(2){animation-delay:.2s;}
+.chat-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes typingDot{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-4px);}}
+
+.chat-input-area{
+  display:flex;gap:8px;padding:10px 14px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.02);
+}
+.chat-input-area input{
+  flex:1;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:10px 14px;
+  color:var(--white);font-size:13px;
+  font-family:'Inter',sans-serif;outline:none;
+  transition:.2s;
+}
+.chat-input-area input:focus{
+  border-color:rgba(66,133,244,0.5);
+  background:rgba(66,133,244,0.05);
+}
+.chat-input-area input::placeholder{color:var(--gray2);}
+#chat-send{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,#4285F4,#34A853);
+  border:none;color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:.3s;
+}
+#chat-send:hover{filter:brightness(1.2);transform:scale(1.05);}
+#chat-send:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none;}
+
+.chat-footer{
+  padding:6px 14px 10px;
+  font-size:10px;color:var(--gray2);
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,0.04);
+  gap:6px;
+}
+.chat-footer a{
+  color:var(--blue3);cursor:pointer;text-decoration:none;
+  transition:.2s;font-size:10px;
+  display:flex;align-items:center;gap:4px;
+}
+.chat-footer a:hover{color:#fff;text-decoration:underline;}
+.chat-footer .key-ok{color:var(--green);}
+.chat-footer .key-none{color:var(--amber);}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .student-card{grid-template-columns:1fr 1fr;}
@@ -259,6 +429,8 @@ footer a:hover{text-decoration:underline;}
   .hero-stats{gap:1.5rem;}
   .grid3{grid-template-columns:1fr;}
   .aula-title{font-size:12px;}
+  .chat-panel{width:calc(100vw - 32px);right:16px;bottom:90px;max-height:70vh;}
+  .chat-fab{bottom:20px;right:20px;width:52px;height:52px;font-size:20px;}
 }
 @media(max-width:480px){
   .student-card{grid-template-columns:1fr;}
@@ -423,6 +595,46 @@ footer a:hover{text-decoration:underline;}
     <button class="btn-close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
   </div>
   <div class="panel-body" id="panel-body"></div>
+</div>
+
+<!-- BOT AI FAB -->
+<button class="chat-fab" onclick="toggleChat()" title="Assistente IA Acadêmico" id="chat-fab-btn">
+  <i class="fas fa-robot"></i>
+  <span class="fab-badge"></span>
+</button>
+
+<!-- BOT AI PANEL -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-head">
+    <h4><span class="ai-logo gemini" id="chat-logo">G</span> <span id="chat-head-title">Assistente Acadêmico</span></h4>
+    <button class="chat-close" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+  </div>
+  <!-- MODEL SWITCHER -->
+  <div class="model-switcher">
+    <button class="model-btn gemini active" onclick="switchModel('gemini')">
+      <i class="fab fa-google"></i> Gemini <span class="free-tag">GRÁTIS</span>
+    </button>
+    <button class="model-btn openai" onclick="switchModel('openai')">
+      <i class="fas fa-bolt"></i> GPT (OpenAI)
+    </button>
+  </div>
+  <div class="chat-body" id="chat-body">
+    <div class="chat-msg bot">👋 Oi! Sou seu assistente acadêmico do mestrado <strong>PPAC — UFC</strong>.
+
+<strong>🟢 Gemini (Google)</strong> — <em>Grátis!</em> Gere sua key em <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue3)">aistudio.google.com</a>
+
+<strong>⚡ GPT (OpenAI)</strong> — Alternativa paga. Use sua key em <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue3)">platform.openai.com</a>
+
+Escolha o modelo acima e configure a key (uma vez só). Cada aluno usa sua própria conta — <strong>sem custo para você!</strong></div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Pergunte algo sobre o mestrado..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()" id="chat-send"><i class="fas fa-paper-plane"></i></button>
+  </div>
+  <div class="chat-footer">
+    <a onclick="configChatKey()" id="chat-key-status"><i class="fas fa-key"></i> Configurar API key</a>
+    <span id="chat-model-label" style="font-size:9px;color:var(--gray2);">Gemini 2.0 Flash</span>
+  </div>
 </div>
 
 <!-- FOOTER -->
@@ -835,11 +1047,273 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCards();
   updateProgress();
 
-  // Keyboard: Escape to close panel
+  // Keyboard: Escape to close panel or chat
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closePanel();
+    if (e.key === 'Escape') {
+      closePanel();
+      const cp = document.getElementById('chat-panel');
+      if (cp.classList.contains('open')) toggleChat();
+    }
   });
+
+  // Init chat key status
+  updateKeyStatus();
 });
+
+// ========================
+// CHATBOT DUAL: Gemini (FREE) + OpenAI GPT
+// ========================
+const CHAT_SYSTEM_PROMPT = `Você é um assistente acadêmico especializado no Mestrado Profissional em Administração e Controladoria (PPAC PROF) da UFC/FEAAC — Turma COGERH 2026.1.
+
+Suas áreas de expertise incluem:
+- Teoria das Organizações (Taylor, Fayol, Weber, Foucault, Braverman, abordagem humanista, comportamental e contemporânea)
+- Metodologia de Pesquisa (qualitativa, quantitativa, normas ABNT, projeto de pesquisa)
+- Controladoria (planejamento, orçamento, gestão de custos, contabilidade gerencial, papéis do controller)
+
+Diretrizes:
+- Responda SEMPRE em português brasileiro
+- Use linguagem acadêmica mas acessível
+- Quando relevante, cite autores e referências bibliográficas
+- Ajude a estruturar fichamentos, resenhas e sínteses
+- Seja objetivo e direto nas respostas
+- Use formatação com bullet points quando apropriado`;
+
+let chatHistory = [];
+let isChatSending = false;
+let currentModel = localStorage.getItem('ppac_chat_model') || 'gemini';
+
+function toggleChat() {
+  const panel = document.getElementById('chat-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    setTimeout(() => document.getElementById('chat-input').focus(), 200);
+  }
+}
+
+// ---- MODEL SWITCHER ----
+function switchModel(model) {
+  currentModel = model;
+  localStorage.setItem('ppac_chat_model', model);
+  // Update buttons
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.model-btn.${model}`).classList.add('active');
+  // Update header
+  const logo = document.getElementById('chat-logo');
+  const title = document.getElementById('chat-head-title');
+  const label = document.getElementById('chat-model-label');
+  if (model === 'gemini') {
+    logo.className = 'ai-logo gemini';
+    logo.textContent = 'G';
+    title.textContent = 'Assistente Acadêmico';
+    label.textContent = 'Gemini 2.0 Flash';
+  } else {
+    logo.className = 'ai-logo openai';
+    logo.textContent = '⚡';
+    title.textContent = 'Assistente Acadêmico';
+    label.textContent = 'GPT-4o Mini';
+  }
+  updateKeyStatus();
+}
+
+// ---- KEY MANAGEMENT ----
+function getKey(model) {
+  const m = model || currentModel;
+  return m === 'gemini'
+    ? localStorage.getItem('ppac_gemini_key') || ''
+    : localStorage.getItem('ppac_openai_key') || '';
+}
+
+function configChatKey() {
+  const current = getKey();
+  const isGemini = currentModel === 'gemini';
+  const provider = isGemini ? 'Google Gemini' : 'OpenAI';
+  const url = isGemini ? 'https://aistudio.google.com/apikey' : 'https://platform.openai.com/api-keys';
+  const prefix = isGemini ? 'AIza' : 'sk-';
+  const msg = current
+    ? `Sua API key ${provider} está configurada (${current.slice(0, 8)}...).\n\nDeseja alterar? Cole a nova key ou cancele.`
+    : `Cole sua API key ${provider} (começa com ${prefix}...).\n\n${isGemini ? '🆓 GRÁTIS! ' : ''}Obtenha em: ${url}`;
+  const key = prompt(msg, '');
+  if (key !== null && key.trim()) {
+    const storageKey = isGemini ? 'ppac_gemini_key' : 'ppac_openai_key';
+    localStorage.setItem(storageKey, key.trim());
+    updateKeyStatus();
+    addBotMsg(`✅ API key ${provider} configurada! Agora pode me perguntar o que quiser.`);
+  }
+}
+
+function updateKeyStatus() {
+  const el = document.getElementById('chat-key-status');
+  const key = getKey();
+  const provider = currentModel === 'gemini' ? 'Gemini' : 'OpenAI';
+  if (key) {
+    el.innerHTML = `<span class="key-ok"><i class="fas fa-check-circle"></i> Key ${provider} ativa</span>`;
+  } else {
+    el.innerHTML = `<span class="key-none"><i class="fas fa-key"></i> Configurar key ${provider}</span>`;
+  }
+}
+
+// ---- MESSAGE HELPERS ----
+function addBotMsg(text) {
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.innerHTML = text.replace(/\n/g, '<br>');
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function addUserMsg(text) {
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = 'chat-msg user';
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function addErrorMsg(text) {
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = 'chat-msg error';
+  div.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>${text}`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function showTyping() {
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = 'chat-typing';
+  div.id = 'chat-typing-indicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function hideTyping() {
+  const el = document.getElementById('chat-typing-indicator');
+  if (el) el.remove();
+}
+
+// ---- SEND (DUAL ENGINE) ----
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || isChatSending) return;
+
+  const key = getKey();
+  const provider = currentModel === 'gemini' ? 'Google Gemini' : 'OpenAI';
+  if (!key) {
+    addErrorMsg(`Configure sua API key ${provider} primeiro. Clique no link abaixo.`);
+    return;
+  }
+
+  addUserMsg(text);
+  input.value = '';
+  isChatSending = true;
+  document.getElementById('chat-send').disabled = true;
+  chatHistory.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    let reply;
+    if (currentModel === 'gemini') {
+      reply = await callGemini(key, text);
+    } else {
+      reply = await callOpenAI(key, text);
+    }
+    chatHistory.push({ role: 'assistant', content: reply });
+    addBotMsg(reply);
+  } catch (e) {
+    hideTyping();
+    if (e.message.includes('401') || e.message.includes('INVALID')) {
+      addErrorMsg('API key inválida ou expirada. Clique abaixo para reconfigurar.');
+      const storageKey = currentModel === 'gemini' ? 'ppac_gemini_key' : 'ppac_openai_key';
+      localStorage.removeItem(storageKey);
+      updateKeyStatus();
+    } else if (e.message.includes('429')) {
+      addErrorMsg('Limite de requisições atingido. Aguarde um momento e tente novamente.');
+    } else {
+      addErrorMsg(`Erro: ${e.message}`);
+    }
+    chatHistory.pop();
+    console.error('Chat error:', e);
+  }
+
+  isChatSending = false;
+  document.getElementById('chat-send').disabled = false;
+  input.focus();
+}
+
+// ---- GEMINI API (FREE) ----
+async function callGemini(key, userText) {
+  // Build conversation for Gemini
+  const contents = [];
+  // System instruction goes as first user+model exchange
+  contents.push({ role: 'user', parts: [{ text: CHAT_SYSTEM_PROMPT }] });
+  contents.push({ role: 'model', parts: [{ text: 'Entendido! Sou o assistente acadêmico do PPAC. Como posso ajudar?' }] });
+  // Add history
+  chatHistory.slice(-18).forEach(m => {
+    contents.push({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.content }]
+    });
+  });
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1024
+        }
+      })
+    }
+  );
+
+  hideTyping();
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Erro ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Desculpe, não consegui processar sua pergunta.';
+}
+
+// ---- OPENAI API ----
+async function callOpenAI(key, userText) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: CHAT_SYSTEM_PROMPT },
+        ...chatHistory.slice(-20)
+      ],
+      max_tokens: 1024,
+      temperature: 0.7
+    })
+  });
+
+  hideTyping();
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Erro ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || 'Desculpe, não consegui processar sua pergunta.';
+}
+
+// Init model on load
+switchModel(currentModel);
 </script>
 </body>
 </html>
