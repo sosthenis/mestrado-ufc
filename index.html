@@ -1013,11 +1013,16 @@ body.has-status-bar nav{top:28px;}
       <span style="background:rgba(79,195,247,0.15);color:var(--blue3);font-size:12px;padding:3px 10px;border-radius:50px;font-weight:700;" id="disc-count">6</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
-      <button class="panel-action-btn" onclick="downloadBackup()"
-        title="Baixar backup JSON com todos os dados atuais"
+      <button class="panel-action-btn" id="btn-backup" onclick="downloadBackup()"
+        title="Salvar backup JSON na pasta configurada"
         style="background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);font-size:12px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:7px;"
         onmouseover="this.style.background='rgba(16,185,129,0.22)'" onmouseout="this.style.background='rgba(16,185,129,0.1)'">
-        <i class="fas fa-shield-alt"></i> Backup
+        <i class="fas fa-shield-alt"></i> <span id="backup-btn-label">Backup</span>
+      </button>
+      <button onclick="resetBackupFolder()" title="Mudar pasta de backup"
+        style="background:rgba(255,255,255,0.04);color:var(--gray);border:1px solid rgba(255,255,255,0.08);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:.2s;"
+        onmouseover="this.style.color='var(--white)'" onmouseout="this.style.color='var(--gray)'">
+        <i class="fas fa-folder-open"></i>
       </button>
       <button class="panel-action-btn" onclick="openAddDisciplineModal()"
         style="background:rgba(79,195,247,0.1);color:var(--blue3);border:1px solid rgba(79,195,247,0.2);font-size:12px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:7px;"
@@ -2244,12 +2249,78 @@ function showToast(msg, type = 'success') {
 }
 
 // ========================
-// BACKUP JSON DOWNLOAD
+// BACKUP — IndexedDB directory persistence
 // ========================
-async function downloadBackup() {
-  const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-  const filename = `backup_ppac_${dateStr}.json`;
+const _IDB_NAME    = 'ppac_backup_store';
+const _IDB_KEY     = 'backupDirHandle';
 
+// --- tiny IndexedDB helpers ---
+function _idbOpen() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(_IDB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('kv');
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+async function _idbGet(key) {
+  const db = await _idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('kv', 'readonly');
+    const req = tx.objectStore('kv').get(key);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+async function _idbSet(key, val) {
+  const db = await _idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(val, key);
+    tx.oncomplete = () => res();
+    tx.onerror    = e => rej(e.target.error);
+  });
+}
+async function _idbDel(key) {
+  const db = await _idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').delete(key);
+    tx.oncomplete = () => res();
+    tx.onerror    = e => rej(e.target.error);
+  });
+}
+
+// --- check & update button label ---
+async function _refreshBackupLabel() {
+  const lbl = document.getElementById('backup-btn-label');
+  if (!lbl) return;
+  try {
+    const h = await _idbGet(_IDB_KEY);
+    lbl.textContent = h ? `Backup → ${h.name}` : 'Backup';
+  } catch { lbl.textContent = 'Backup'; }
+}
+
+// --- get stored handle, re-requesting permission if needed ---
+async function _getBackupDir(forceNew = false) {
+  if (!window.showDirectoryPicker) return null;
+  if (!forceNew) {
+    const stored = await _idbGet(_IDB_KEY);
+    if (stored) {
+      // ask browser to confirm permission (no dialog if already granted)
+      const perm = await stored.requestPermission({ mode: 'readwrite' });
+      if (perm === 'granted') return stored;
+    }
+  }
+  // First time (or reset) — open directory picker
+  const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+  await _idbSet(_IDB_KEY, handle);
+  return handle;
+}
+
+async function downloadBackup() {
+  const dateStr  = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+  const filename = `backup_ppac_${dateStr}.json`;
   const data = {
     backup_date: new Date().toISOString(),
     student: studentData || BACKUP_DATA.student,
@@ -2257,34 +2328,45 @@ async function downloadBackup() {
   };
   const json = JSON.stringify(data, null, 2);
 
-  // -- Tenta File System Access API (Chrome/Edge): abre diálogo "Salvar como"
-  // -- na pasta do projeto. O browser lembra a última pasta escolhida.
-  if (window.showSaveFilePicker) {
-    try {
-      const fh = await window.showSaveFilePicker({
-        suggestedName: filename,
-        types: [{ description: 'Arquivo JSON', accept: { 'application/json': ['.json'] } }]
-      });
-      const writable = await fh.createWritable();
+  // --- try directory-based save (remembered folder) ---
+  try {
+    const dir = await _getBackupDir();
+    if (dir) {
+      const fileHandle = await dir.getFileHandle(filename, { create: true });
+      const writable   = await fileHandle.createWritable();
       await writable.write(json);
       await writable.close();
-      showToast(`💾 Backup salvo: ${fh.name}`, 'success');
+      await _refreshBackupLabel();
+      showToast(`💾 Backup salvo em "${dir.name}/${filename}"`, 'success');
       return;
-    } catch(e) {
-      if (e.name === 'AbortError') return; // usuário cancelou
-      console.warn('showSaveFilePicker falhou, usando fallback:', e);
     }
+  } catch(e) {
+    if (e.name === 'AbortError') return;
+    console.warn('Directory backup failed, using fallback:', e);
   }
 
-  // -- Fallback para Safari / Firefox: download normal para pasta Downloads
+  // --- fallback: classic download ---
   const blob = new Blob([json], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href     = url;
-  a.download = filename;
-  a.click();
+  a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
   showToast(`💾 Backup baixado: ${filename}`, 'success');
+}
+
+async function resetBackupFolder() {
+  await _idbDel(_IDB_KEY);
+  const lbl = document.getElementById('backup-btn-label');
+  if (lbl) lbl.textContent = 'Backup';
+  showToast('📂 Pasta redefinida. Próximo backup pedirá a pasta.', 'success');
+  // imediato: abre o picker para já configurar a nova pasta
+  try {
+    const dir = await _getBackupDir(true);
+    if (dir) {
+      if (lbl) lbl.textContent = `Backup → ${dir.name}`;
+      showToast(`✅ Pasta configurada: "${dir.name}"`, 'success');
+    }
+  } catch(e) { if (e.name !== 'AbortError') console.warn(e); }
 }
 
 // ========================
@@ -2313,6 +2395,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Init chat key status
   updateKeyStatus();
+
+  // Restore backup folder label from IndexedDB
+  _refreshBackupLabel();
 
   // Firebase connectivity + cloud sync
   checkFirebaseConnection();
