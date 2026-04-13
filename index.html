@@ -12,6 +12,25 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script>
+  // VERIFICAÇÃO DE LOGIN
+  const userRole = localStorage.getItem('userRole');
+  if (!userRole) {
+    window.location.href = 'login.html';
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    if (userRole === 'viewer') {
+      document.body.classList.add('viewer-mode');
+    }
+  });
+  
+  function logout() {
+    localStorage.removeItem('userRole');
+    window.location.href = 'login.html';
+  }
+</script>
+
 <style>
 :root{
   --navy:#0b1623;--navy2:#101d2e;--navy3:#162640;
@@ -857,6 +876,22 @@ body.has-status-bar nav{top:28px;}
 @media(max-width:480px){
   .student-card{grid-template-columns:1fr;}
 }
+
+/* VIEWER MODE RESTRICTIONS */
+body.viewer-mode .btn-icon-del,
+body.viewer-mode .btn-icon-edit,
+body.viewer-mode .btn-icon-add,
+body.viewer-mode .add-aula,
+body.viewer-mode .del-disc,
+body.viewer-mode .upload-zone,
+body.viewer-mode .file-dropzone,
+body.viewer-mode .mfi-remove,
+body.viewer-mode .btn-del-file,
+body.viewer-mode .ementa-actions,
+body.viewer-mode [onclick^="removeEmentaFile"],
+body.viewer-mode [onclick="openAddDisciplineModal()"] {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -888,6 +923,14 @@ body.has-status-bar nav{top:28px;}
         style="background:rgba(16,185,129,0.12);color:var(--green);border:1px solid rgba(16,185,129,0.25);font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:6px;white-space:nowrap;"
         onmouseover="this.style.background='rgba(16,185,129,0.25)'" onmouseout="this.style.background='rgba(16,185,129,0.12)'">
         <i class="fas fa-shield-alt"></i> <span id="backup-btn-label">Backup</span>
+      </button>
+
+      <!-- SAIR -->
+      <button onclick="logout()" 
+        title="Sair do Sistema"
+        style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;display:flex;align-items:center;gap:6px;white-space:nowrap;margin-left:6px;"
+        onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
+        <i class="fas fa-sign-out-alt"></i> Sair
       </button>
       <button onclick="resetBackupFolder()" title="Mudar pasta de backup"
         style="background:rgba(255,255,255,0.04);color:var(--gray);border:1px solid rgba(255,255,255,0.08);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:.2s;"

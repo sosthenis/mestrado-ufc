@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal do Mestrado - Acesso COGERH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --navy: #0b1623;
+      --navy2: #101d2e;
+      --blue: #0e6ba8;
+      --blue3: #4fc3f7;
+      --green: #10B981;
+      --white: #e8f0fa;
+      --gray: #8ba3bf;
+      --radius: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* BACKGROUND ANIMATIONS (WAVE GLASS) */
+    .bg-animation {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 30%, rgba(14,107,168,0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 80% 80%, rgba(79,195,247,0.1) 0%, transparent 60%);
+    }
+
+    .hero-ribbon { position: absolute; width: 200%; height: 100%; z-index: 1; pointer-events: none; }
+    .hero-ribbon svg { width: 100%; height: 100%; overflow: visible; opacity: 0.6; }
+    .ribbon-1 { left: -30%; top: -10%; animation: ribbonFlow1 12s ease-in-out infinite; }
+    .ribbon-2 { left: -50%; top: 5%; animation: ribbonFlow2 15s ease-in-out infinite; }
+
+    @keyframes ribbonFlow1 {
+      0%, 100% { transform: translateX(0) rotate(0deg) scaleY(1); }
+      50% { transform: translateX(-2%) rotate(1deg) scaleY(1.05); }
+    }
+    @keyframes ribbonFlow2 {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      50% { transform: translateX(3%) rotate(-1deg); }
+    }
+
+    /* LOGIN CARD (GLASSMORPHISM) */
+    .login-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      padding: 0 20px;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(28px) saturate(1.4);
+      -webkit-backdrop-filter: blur(28px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(79, 195, 247, 0.08);
+      position: relative;
+      overflow: hidden;
+      animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    @keyframes popIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.2) 50%, transparent 90%);
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--blue), var(--blue3));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(79, 195, 247, 0.3);
+      position: relative;
+    }
+    .logo-icon::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid rgba(79, 195, 247, 0.4);
+      animation: pulse 2s infinite ease-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .login-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 6px;
+    }
+
+    /* FORM ELEMENTS */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .form-control:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(79, 195, 247, 0.5);
+      box-shadow: 0 0 0 4px rgba(79, 195, 247, 0.1);
+    }
+
+    select.form-control {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238ba3bf'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 20px;
+    }
+    
+    select.form-control option {
+      background: var(--navy2);
+      color: var(--white);
+      padding: 10px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue), var(--blue3));
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0.5px;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 6px 20px rgba(14, 107, 168, 0.4);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(14, 107, 168, 0.6);
+      filter: brightness(1.1);
+    }
+    
+    .error-msg {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BACKGROUND ANIMATIONS -->
+  <div class="bg-animation">
+    <div class="hero-ribbon ribbon-1">
+      <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+        <path fill="url(#grad1)" d="M437,294.5C538.5,234,710.5,259.5,821,343.5C931.5,427.5,980.5,570,951,701.5C921.5,833,813.5,953.5,670,983.5C526.5,1013.5,347.5,953,246,846C144.5,739,120.5,585.5,142,448C163.5,310.5,230.5,188.5,324.5,143C418.5,97.5,540,128.5,437,294.5Z" />
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(79, 195, 247, 0.2)" />
+            <stop offset="100%" stop-color="rgba(14, 107, 168, 0.05)" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="hero-ribbon ribbon-2">
+      <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+        <path fill="url(#grad2)" d="M542,883.5C401.5,907,249,864,151.5,753C54,642,11.5,463,55,320.5C98.5,178,228,72,367,41C506,10,654.5,54,771.5,144.5C888.5,235,974,372,979.5,515C985,658,910.5,807,794,888.5C677.5,970,518.5,984.5,542,883.5Z" />
+        <defs>
+          <linearGradient id="grad2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(16, 185, 129, 0.08)" />
+            <stop offset="100%" stop-color="rgba(14, 107, 168, 0.15)" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+      
+      <div class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-water"></i>
+        </div>
+        <h1 class="login-title">Acesso Seguro</h1>
+        <p class="login-subtitle">Dashboard Acadêmico PPAC - COGERH</p>
+      </div>
+
+      <div id="error-alert" class="error-msg">
+        <i class="fas fa-exclamation-circle"></i> Credenciais incorretas. Tente novamente.
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label>E-mail Corporativo</label>
+          <select id="email" class="form-control" required>
+            <option value="mestrado@ufc_cogerh.edu">mestrado@ufc_cogerh.edu</option>
+            <option value="sosthenis@ufc_cogerh.edu">sosthenis@ufc_cogerh.edu</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Senha de Acesso</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          Entrar no Sistema <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const pwd = document.getElementById('password').value;
+      const errorAlert = document.getElementById('error-alert');
+
+      // Validar usuários
+      if (email === 'mestrado@ufc_cogerh.edu' && pwd === '12345') {
+        localStorage.setItem('userRole', 'viewer');
+        window.location.href = 'index.html';
+      } else if (email === 'sosthenis@ufc_cogerh.edu' && pwd === 'cogerh2026') {
+        localStorage.setItem('userRole', 'admin');
+        window.location.href = 'index.html';
+      } else {
+        errorAlert.style.display = 'block';
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    });
+
+    // Se já estiver logado, encaminha direto pro painel
+    if (localStorage.getItem('userRole')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>
