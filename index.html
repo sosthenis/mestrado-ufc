@@ -191,6 +191,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(11,22,35,0.45);backdrop-fi
 
 /* AULA */
 .ementa-box{background:rgba(14,107,168,0.1);border:1px solid rgba(14,107,168,0.2);border-radius:var(--radius2);padding:20px;margin-bottom:24px;font-size:14px;line-height:1.8;color:var(--gray);}
+.ementa-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ementa-actions{display:flex;align-items:center;gap:6px;}
+.ementa-file-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(79,195,247,0.12);flex-wrap:wrap;}
 .aulas-section h3{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:#fff;}
 .aula-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius2);margin-bottom:10px;overflow:hidden;transition:.25s;backdrop-filter:blur(8px);}
 .aula-item:hover{border-color:rgba(79,195,247,0.3);background:rgba(255,255,255,0.06);transform:translateX(4px);}
@@ -1668,6 +1671,102 @@ function panelDrop(e, discId, aulaId) {
 }
 
 // ========================
+// EMENTA FILE & TEXT
+// ========================
+async function uploadEmentaFile(discId, inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+  const d = disciplines.find(x => x.id === discId);
+  if (!d) return;
+  showSyncing(true);
+  try {
+    const path = `files/${getDocId()}/${_calId(discId)}/ementa/${file.name}`;
+    const ref  = storage.ref().child(path);
+    const snap = await ref.put(file);
+    const url  = await snap.ref.getDownloadURL();
+    d.ementaFile = { name: file.name, url };
+    await saveData();
+    // Re-render panel
+    const pb = document.getElementById('panel-body');
+    if (pb) pb.innerHTML = buildPanelBody(d);
+    showToast(`\ud83d\udcce Ementa anexada: ${file.name}`, 'success');
+  } catch(e) {
+    console.error('Ementa upload error:', e);
+    showToast('Erro ao fazer upload da ementa.', 'error');
+  }
+  showSyncing(false);
+}
+
+async function removeEmentaFile(discId) {
+  if (!confirm('Remover o arquivo da ementa?')) return;
+  const d = disciplines.find(x => x.id === discId);
+  if (!d) return;
+  d.ementaFile = null;
+  await saveData();
+  const pb = document.getElementById('panel-body');
+  if (pb) pb.innerHTML = buildPanelBody(d);
+  showToast('Arquivo da ementa removido.', 'success');
+}
+
+function editEmentaText(discId) {
+  const d = disciplines.find(x => x.id === discId);
+  if (!d) return;
+
+  // Remove modal anterior se existir
+  document.getElementById('ementa-edit-modal')?.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'ementa-edit-modal';
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9900;
+    background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  `;
+  overlay.innerHTML = `
+    <div style="background:#162640;border:1px solid rgba(79,195,247,0.25);border-radius:16px;
+      padding:28px;width:100%;max-width:600px;box-shadow:0 24px 60px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <span style="font-size:16px;font-weight:700;color:#fff;">✏️ Editar Ementa</span>
+        <button onclick="document.getElementById('ementa-edit-modal').remove()"
+          style="background:none;border:none;color:#8ba3bf;cursor:pointer;font-size:20px;line-height:1;">✕</button>
+      </div>
+      <p style="font-size:12px;color:#8ba3bf;margin-bottom:10px;">Disciplina: <strong style="color:#4fc3f7;">${d.name}</strong></p>
+      <textarea id="ementa-edit-ta" style="width:100%;min-height:200px;background:rgba(255,255,255,0.05);
+        border:1px solid rgba(79,195,247,0.2);border-radius:10px;padding:14px;color:#e8f0fa;
+        font-family:'Inter',sans-serif;font-size:13px;line-height:1.8;resize:vertical;outline:none;"
+        placeholder="Texto da ementa...">${d.ementa || ''}</textarea>
+      <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+        <button onclick="document.getElementById('ementa-edit-modal').remove()"
+          style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#8ba3bf;
+            padding:9px 20px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;">
+          Cancelar
+        </button>
+        <button onclick="saveEmentaText('${discId}')"
+          style="background:linear-gradient(135deg,#0e6ba8,#4fc3f7);border:none;color:#fff;
+            padding:9px 24px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;">
+          <i class='fas fa-save' style='margin-right:6px;'></i>Salvar
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('ementa-edit-ta').focus();
+}
+
+async function saveEmentaText(discId) {
+  const ta = document.getElementById('ementa-edit-ta');
+  if (!ta) return;
+  const d = disciplines.find(x => x.id === discId);
+  if (!d) return;
+  d.ementa = ta.value.trim();
+  await saveData();
+  document.getElementById('ementa-edit-modal')?.remove();
+  // Update text inline without full re-render
+  const el = document.getElementById(`ementa-text-${discId}`);
+  if (el) el.textContent = d.ementa;
+  showToast('\u2705 Ementa atualizada com sucesso!', 'success');
+}
+
+
+// ========================
 // RENDER STUDENT CARD
 // ========================
 function renderStudentCard() {
@@ -1927,7 +2026,34 @@ function buildPanelBody(d) {
       <span style="font-size:13px;color:var(--gray);display:flex;align-items:center;gap:6px;"><i class="fas fa-star"></i>${d.credits} créditos</span>
       <span style="font-size:13px;color:var(--gray);display:flex;align-items:center;gap:6px;"><i class="fas fa-file-alt"></i>${totalFiles} arquivos</span>
     </div>
-    <div class="ementa-box"><strong style="color:var(--white);display:block;margin-bottom:8px;">📋 Ementa</strong>${d.ementa}</div>
+    <div class="ementa-box">
+      <div class="ementa-header">
+        <strong style="color:var(--white);display:flex;align-items:center;gap:8px;">📋 Ementa</strong>
+        <div class="ementa-actions">
+          <label title="Upload arquivo da ementa" style="width:28px;height:28px;border-radius:7px;background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.2);color:var(--blue3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:.2s;position:relative;" onmouseover="this.style.background='rgba(79,195,247,0.22)'" onmouseout="this.style.background='rgba(79,195,247,0.1)'">
+            <i class="fas fa-paperclip"></i>
+            <input type="file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;" onchange="uploadEmentaFile('${d.id}',this)">
+          </label>
+          <button title="Editar texto da ementa" onclick="editEmentaText('${d.id}')" style="width:28px;height:28px;border-radius:7px;background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.2);color:var(--blue3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:.2s;" onmouseover="this.style.background='rgba(79,195,247,0.22)'" onmouseout="this.style.background='rgba(79,195,247,0.1)'">
+            <i class="fas fa-pen"></i>
+          </button>
+        </div>
+      </div>
+      <div id="ementa-text-${d.id}">${d.ementa || '<em style="opacity:.5">Nenhuma ementa cadastrada.</em>'}</div>
+      ${d.ementaFile ? `
+      <div class="ementa-file-row">
+        <i class="fas fa-file-pdf" style="color:#f87171;font-size:16px;"></i>
+        <a href="${d.ementaFile.url}" target="_blank" style="color:var(--blue3);font-size:13px;font-weight:600;text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${d.ementaFile.name}">${d.ementaFile.name}</a>
+        <span style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;">PDF</span>
+        <a href="${d.ementaFile.url}" target="_blank" class="btn-download" title="Abrir"><i class="fas fa-external-link-alt"></i></a>
+        <button onclick="removeEmentaFile('${d.id}')" title="Remover arquivo da ementa" style="width:26px;height:26px;border-radius:6px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:.2s;" onmouseover="this.style.background='rgba(239,68,68,0.28)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>` : `
+      <div class="ementa-file-row" style="opacity:.5;font-size:12px;">
+        <i class="fas fa-paperclip"></i> Nenhum arquivo anexado — clique no <i class="fas fa-paperclip"></i> para fazer upload do PDF da ementa.
+      </div>`}
+    </div>
     <div class="aulas-section">
       <h3><i class="fas fa-chalkboard-teacher" style="color:var(--blue3)"></i> Aulas (${d.aulas.length})</h3>
       ${aulasHTML}
