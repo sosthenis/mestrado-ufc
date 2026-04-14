@@ -2187,6 +2187,7 @@ function confirmAddDiscipline() {
     aulas: []
   };
   disciplines.push(newDisc);
+  saveData();
   closeModal('modal-add-disc');
   renderCards();
   updateProgress();
@@ -2211,6 +2212,7 @@ function openDeleteDiscModal() {
   const okBtn = document.getElementById('modal-confirm-ok');
   okBtn.onclick = () => {
     disciplines = disciplines.filter(x => x.id !== _currentPanelDiscId);
+    saveData();
     closeModal('modal-confirm');
     closePanel();
     renderCards();
@@ -2344,6 +2346,7 @@ function confirmAddAula() {
   d.aulas.push({ id: maxId + 1, title, files });
   // Keep blob URLs alive (stored in disciplines array)
   _aulaUploadFiles = [];
+  saveData();
   closeModal('modal-add-aula');
   document.getElementById('panel-body').innerHTML = buildPanelBody(d);
   const fCount = files.length;
@@ -2365,6 +2368,7 @@ function openDeleteAulaModal(discId, aulaId) {
   const okBtn = document.getElementById('modal-confirm-ok');
   okBtn.onclick = () => {
     d.aulas = d.aulas.filter(x => x.id !== aulaId);
+    saveData();
     closeModal('modal-confirm');
     document.getElementById('panel-body').innerHTML = buildPanelBody(d);
     showToast('Aula excluída com sucesso.', 'success');
@@ -2391,6 +2395,7 @@ function confirmRenameAula() {
   const a = d && d.aulas.find(x => x.id === _pendingAulaId);
   if (!a) return;
   a.title = newTitle;
+  saveData();
   closeModal('modal-rename-aula');
   document.getElementById('panel-body').innerHTML = buildPanelBody(d);
   showToast('Aula renomeada com sucesso!', 'success');
