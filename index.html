@@ -1035,34 +1035,6 @@ body.viewer-mode [onclick="openAddDisciplineModal()"] {
   <div class="student-card" id="student-card-render"></div>
 </div>
 
-<!-- PROGRESSO -->
-<div id="progresso" class="section">
-  <div class="section-title"><i class="fas fa-chart-line"></i> Progresso Acadêmico</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-    <div class="progress-block">
-      <div class="progress-header"><h3><i class="fas fa-clock" style="margin-right:6px;color:var(--blue3)"></i>Carga Horária</h3><span id="ph-ch">0 / 480h</span></div>
-      <div class="progress-bar"><div class="progress-fill" id="pf-ch" style="width:0%"></div></div>
-      <div class="progress-meta" id="pm-ch"><span>0% integralizado</span><span>480h pendente</span></div>
-    </div>
-    <div class="progress-block">
-      <div class="progress-header"><h3><i class="fas fa-star" style="margin-right:6px;color:var(--gold2)"></i>Créditos</h3><span id="ph-cr">0 / 30</span></div>
-      <div class="progress-bar"><div class="progress-fill gold" id="pf-cr" style="width:0%"></div></div>
-      <div class="progress-meta" id="pm-cr"><span>0% integralizado</span><span>30 pendentes</span></div>
-    </div>
-  </div>
-  <div class="timeline-bar">
-    <div class="section-title" style="margin-bottom:0;font-size:16px;"><i class="fas fa-map-signs"></i> Linha do Tempo</div>
-    <div class="timeline-track">
-      <div class="timeline-step"><div class="timeline-dot done"></div><div class="timeline-label"><strong>Ingresso</strong>MAR/2026</div></div>
-      <div class="timeline-step"><div class="timeline-dot active"></div><div class="timeline-label"><strong>Disciplinas</strong>2026</div></div>
-      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Proficiência</strong>2026</div></div>
-      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Qualificação</strong>2027</div></div>
-      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Dissertação</strong>2027/28</div></div>
-      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Defesa</strong>FEV/2028</div></div>
-    </div>
-  </div>
-</div>
-
 <!-- DISCIPLINAS -->
 <div id="disciplinas" class="section">
   <div class="section-title" style="justify-content:space-between;flex-wrap:wrap;gap:10px;">
@@ -1092,6 +1064,34 @@ body.viewer-mode [onclick="openAddDisciplineModal()"] {
   <div id="tab-pendente" class="tab-content">
     <div style="margin-bottom:20px;font-size:13px;color:var(--gray);">Componentes obrigatórios ainda não cursados:</div>
     <div class="pending-grid" id="pending-grid"></div>
+  </div>
+</div>
+
+<!-- PROGRESSO -->
+<div id="progresso" class="section">
+  <div class="section-title"><i class="fas fa-chart-line"></i> Progresso Acadêmico</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="progress-block">
+      <div class="progress-header"><h3><i class="fas fa-clock" style="margin-right:6px;color:var(--blue3)"></i>Carga Horária</h3><span id="ph-ch">0 / 480h</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="pf-ch" style="width:0%"></div></div>
+      <div class="progress-meta" id="pm-ch"><span>0% integralizado</span><span>480h pendente</span></div>
+    </div>
+    <div class="progress-block">
+      <div class="progress-header"><h3><i class="fas fa-star" style="margin-right:6px;color:var(--gold2)"></i>Créditos</h3><span id="ph-cr">0 / 30</span></div>
+      <div class="progress-bar"><div class="progress-fill gold" id="pf-cr" style="width:0%"></div></div>
+      <div class="progress-meta" id="pm-cr"><span>0% integralizado</span><span>30 pendentes</span></div>
+    </div>
+  </div>
+  <div class="timeline-bar">
+    <div class="section-title" style="margin-bottom:0;font-size:16px;"><i class="fas fa-map-signs"></i> Linha do Tempo</div>
+    <div class="timeline-track">
+      <div class="timeline-step"><div class="timeline-dot done"></div><div class="timeline-label"><strong>Ingresso</strong>MAR/2026</div></div>
+      <div class="timeline-step"><div class="timeline-dot active"></div><div class="timeline-label"><strong>Disciplinas</strong>2026</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Proficiência</strong>2026</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Qualificação</strong>2027</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Dissertação</strong>2027/28</div></div>
+      <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label"><strong>Defesa</strong>FEV/2028</div></div>
+    </div>
   </div>
 </div>
 
@@ -1821,36 +1821,12 @@ function renderStudentCard() {
       <value><span class="status-badge ${statusClass}">${s.status || '—'}</span></value>
     </div>
     <div class="student-field">
-      <label>Tempo de Curso</label>
-      <value>${s.mes || '—'}</value>
-    </div>
-    <div class="student-field">
       <label>Programa PPAC</label>
       <value>${s.programa || '—'}</value>
     </div>
     <div class="student-field">
       <label>Ciclo / Prazo Final</label>
       <value>${s.inicio || '—'} → ${s.prazo || '—'}</value>
-    </div>
-    <div class="student-field">
-      <label>Matriz Curricular</label>
-      <value>${s.curriculo || '—'}</value>
-    </div>
-    <div class="student-field">
-      <label>Área de Atuação</label>
-      <value>${s.area || '—'}</value>
-    </div>
-    <div class="student-field">
-      <label>Linha Estratégica</label>
-      <value>${s.linha || '—'}</value>
-    </div>
-    <div class="student-field">
-      <label>Via de Ingresso</label>
-      <value>${s.ingresso || '—'}</value>
-    </div>
-    <div class="student-field">
-      <label>Orientação</label>
-      <value>${s.orientador || '—'}</value>
     </div>
     <div class="student-field">
       <label>Instituição</label>
@@ -1931,9 +1907,11 @@ function buildCard(d) {
       </div>
       <p style="font-size:12px;color:var(--gray);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${d.ementa}</p>
     </div>
+    ${['PROFICIÊNCIA', 'QUALIFICAÇÃO', 'DISSERTAÇÃO'].includes(d.name) ? '' : `
     <div class="disc-card-actions">
       <button class="btn-sm btn-primary" onclick="openPanel('${d.id}')" style="width:100%"><i class="fas fa-folder-open"></i> Ver Materiais e Aulas</button>
-    </div>`;
+    </div>`}
+`;
   return div;
 }
 
