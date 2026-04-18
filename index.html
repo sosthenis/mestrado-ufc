@@ -2143,9 +2143,11 @@ function updateProgress() {
   document.getElementById('ph-cr').textContent = `${doneCR} / ${MAX_CR}`;
   document.getElementById('pm-cr').innerHTML = `<span>${pctCR}% integralizado</span><span>${MAX_CR - doneCR} pendentes</span>`;
 
-  // Hero stats
-  document.getElementById('stat-ativas').textContent = ativas;
-  document.getElementById('stat-ch').textContent = pctCH + '%';
+  // Hero stats removed
+  const elAtivas = document.getElementById('stat-ativas');
+  if (elAtivas) elAtivas.textContent = ativas;
+  const elCh = document.getElementById('stat-ch');
+  if (elCh) elCh.textContent = pctCH + '%';
 }
 
 // ========================
@@ -3200,7 +3202,7 @@ switchModel(currentModel);
   </a>
   <a class="side-link ext" href="https://ppacprof.ufc.br/pt/galeria-de-fotos/" target="_blank">
     <div class="side-link-title">📸 Galeria de Fotos</div>
-    <div class="side-link-desc">Eventos, defesas e atividades do programa</div>
+    <div class="side-link-desc">Coletânea oficial de links recomendados</div>
   </a>
   <a class="side-link ext" href="https://ppacprof.ufc.br/pt/links-uteis/" target="_blank">
     <div class="side-link-title">🔗 Links Úteis (PPAC)</div>
