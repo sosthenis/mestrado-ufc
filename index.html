@@ -892,6 +892,36 @@ body.viewer-mode [onclick^="removeEmentaFile"],
 body.viewer-mode [onclick="openAddDisciplineModal()"] {
   display: none !important;
 }
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--navy); border-right: 1px solid var(--border);
+  padding: 20px 16px; font-family: 'Inter', sans-serif;
+}
+.side-head { padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.side-head h1 { font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin-bottom: 4px; }
+.side-head p { font-size: 11px; color: var(--gray); line-height: 1.4; }
+.side-search { margin-bottom: 20px; }
+.side-search input { width: 100%; background: var(--card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; color: #fff; font-size: 12px; outline: none; }
+.side-search input:focus { border-color: var(--blue3); }
+.side-cat { font-size: 11px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 1px; margin: 24px 0 10px; display: flex; align-items: center; justify-content: space-between; }
+.side-cat span { background: rgba(79,195,247,0.15); color: var(--blue3); padding: 2px 6px; border-radius: 4px; font-size: 9px; }
+.side-link { display: block; text-decoration: none; padding: 10px 12px; border-radius: 8px; transition: 0.2s; margin-bottom: 4px; }
+.side-link:hover { background: rgba(79,195,247,0.08); }
+.side-link-title { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.side-link:hover .side-link-title { color: var(--blue3); }
+.side-link-desc { font-size: 10px; color: var(--gray); line-height: 1.4; }
+.side-foot { margin-top: 30px; font-size: 10px; color: var(--gray); text-align: center; border-top: 1px solid var(--border); padding-top: 16px; }
+
+@media (min-width: 1024px) {
+  .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 280px; overflow-y: auto; z-index: 105; box-shadow: 4px 0 30px rgba(0,0,0,0.3); border-right: 1px solid rgba(255,255,255,0.05); }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--blue); }
+  body { margin-left: 280px; }
+}
+@media (max-width: 1023px) {
+  .sidebar { width: 100%; border-top: 1px solid var(--border); margin-top: 40px; }
+}
 </style>
 </head>
 <body>
@@ -906,8 +936,7 @@ body.viewer-mode [onclick="openAddDisciplineModal()"] {
 <nav id="main-nav">
   <div class="nav-inner">
     <div class="logo-box">
-      <div class="logo-ufc">UFC</div>
-      <h1>Mestrado Profissional<br><span style="font-weight:700;color:var(--blue3);text-transform:uppercase;font-size:11px;">Adm e Controladoria (PPAC PROF)</span></h1>
+      <h1>PPAC_COGERH</h1>
     </div>
     <!-- Desktop nav links -->
     <div class="nav-links">
@@ -1047,6 +1076,13 @@ body.viewer-mode [onclick="openAddDisciplineModal()"] {
         onmouseup="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 0 #1a8cdb, 0 5px 15px rgba(0,0,0,0.4)';"
         onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 0 #1a8cdb, 0 5px 15px rgba(0,0,0,0.4)';">
         <i class="fas fa-database"></i> Repositório UFC
+      </a>
+      <a href="https://ppacprof.ufc.br/pt/dissertacoes/" target="_blank" title="Acessar Dissertações PPAC"
+        style="margin-left:4px;background:#ffffff;color:#0e6ba8;font-weight:800;font-size:11px;padding:6px 14px;border-radius:8px;text-decoration:none;text-transform:uppercase;letter-spacing:0.5px;box-shadow: 0 4px 0 #1a8cdb, 0 5px 15px rgba(0,0,0,0.4);border:1px solid #1a8cdb;display:inline-flex;align-items:center;gap:6px;transition:0.1s;cursor:pointer;"
+        onmousedown="this.style.transform='translateY(4px)';this.style.boxShadow='none';"
+        onmouseup="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 0 #1a8cdb, 0 5px 15px rgba(0,0,0,0.4)';"
+        onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 0 #1a8cdb, 0 5px 15px rgba(0,0,0,0.4)';">
+        <i class="fas fa-graduation-cap"></i> Dissertações PPAC
       </a>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -3047,6 +3083,170 @@ async function callOpenAI(key, userText) {
 
 // Init model on load
 switchModel(currentModel);
+</script>
+
+<aside class="sidebar">
+  <div class="side-head">
+    <h1>Portal PPAC · UFC</h1>
+    <p>Mestrado Profissional · Turma 2026.1 · COGERH</p>
+  </div>
+
+  <div class="side-search">
+    <input type="text" placeholder="🔍 Filtrar links..." oninput="filtrarLinks(this.value)">
+  </div>
+
+  <div class="side-cat">Sistemas UFC <span>5</span></div>
+  <a class="side-link ext" href="http://si3.ufc.br/sigaa" target="_blank">
+    <div class="side-link-title">🎓 SIGAA UFC</div>
+    <div class="side-link-desc">Matrícula, notas, frequência e atestados</div>
+  </a>
+  <a class="side-link ext" href="https://repositorio.ufc.br/" target="_blank">
+    <div class="side-link-title">📖 Repositório UFC</div>
+    <div class="side-link-desc">Acervo digital de teses e dissertações</div>
+  </a>
+  <a class="side-link ext" href="https://www.biblioteca.ufc.br/" target="_blank">
+    <div class="side-link-title">📚 Biblioteca Universitária</div>
+    <div class="side-link-desc">Acervo, periódicos CAPES e normalização ABNT</div>
+  </a>
+  <a class="side-link ext" href="http://www.periodicos.capes.gov.br/" target="_blank">
+    <div class="side-link-title">🔍 Periódicos CAPES</div>
+    <div class="side-link-desc">Acesso a milhares de periódicos científicos</div>
+  </a>
+  <a class="side-link ext" href="http://ufc.br/" target="_blank">
+    <div class="side-link-title">🏛️ Portal UFC</div>
+    <div class="side-link-desc">Site institucional da Universidade</div>
+  </a>
+
+  <div class="side-cat">Ferramentas IA <span>3</span></div>
+  <a class="side-link ext" href="https://notebooklm.google.com/" target="_blank">
+    <div class="side-link-title">🤖 NotebookLM</div>
+    <div class="side-link-desc">Pesquisa com seus PDFs do mestrado</div>
+  </a>
+  <a class="side-link ext" href="https://aistudio.google.com/apikey" target="_blank">
+    <div class="side-link-title">🟢 Gemini API Key</div>
+    <div class="side-link-desc">Gere sua chave grátis no Google AI Studio</div>
+  </a>
+  <a class="side-link ext" href="https://platform.openai.com/api-keys" target="_blank">
+    <div class="side-link-title">⚡ OpenAI API Key</div>
+    <div class="side-link-desc">Chave da API do ChatGPT (pago)</div>
+  </a>
+
+  <div class="side-cat">Programa PPAC <span>8</span></div>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/" target="_blank">
+    <div class="side-link-title">🏛️ Site Oficial PPAC</div>
+    <div class="side-link-desc">Página inicial do Programa de Pós-Graduação em Administração e Controladoria</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/sobre-o-ppac-profissional/" target="_blank">
+    <div class="side-link-title">ℹ️ Sobre o PPAC Profissional</div>
+    <div class="side-link-desc">História, missão e área de concentração (Gestão Organizacional)</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/linhas-de-pesquisa/" target="_blank">
+    <div class="side-link-title">🔬 Linhas de Pesquisa</div>
+    <div class="side-link-desc">Linhas ativas e projetos em andamento no programa</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/docentes/" target="_blank">
+    <div class="side-link-title">👥 Corpo Docente</div>
+    <div class="side-link-desc">Professores, áreas de pesquisa e disponibilidade para orientação</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/corpo-discente/" target="_blank">
+    <div class="side-link-title">🎓 Corpo Discente e Egressos</div>
+    <div class="side-link-desc">Mestrandos atuais e egressos do programa</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/estrutura-curricular/" target="_blank">
+    <div class="side-link-title">📋 Integralização Curricular</div>
+    <div class="side-link-desc">Estrutura, créditos e disciplinas do mestrado</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/planejamento-estrategico/" target="_blank">
+    <div class="side-link-title">🎯 Planejamento Estratégico</div>
+    <div class="side-link-desc">Documentos de planejamento e autoavaliação do programa</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/insercao-local-regional-e-nacional/" target="_blank">
+    <div class="side-link-title">🌎 Inserção Local/Regional/Nacional</div>
+    <div class="side-link-desc">Conexões do programa com empresas e governo</div>
+  </a>
+
+
+  <div class="side-cat">Acadêmico e Normativos <span>6</span></div>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/dissertacoes/" target="_blank">
+    <div class="side-link-title">📚 Dissertações Defendidas</div>
+    <div class="side-link-desc">Repositório de dissertações dos egressos</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/regulamentacao-e-formularios/" target="_blank">
+    <div class="side-link-title">📋 Formulários Acadêmicos</div>
+    <div class="side-link-desc">Banca, prorrogação, trancamento, declarações</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/normativos/" target="_blank">
+    <div class="side-link-title">⚖️ Normativos</div>
+    <div class="side-link-desc">Regulamento interno e resoluções do programa</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/produtos-tecnicos-tecnologicos/" target="_blank">
+    <div class="side-link-title">🛠️ Produtos Técnicos</div>
+    <div class="side-link-desc">Catálogo de produtos do mestrado profissional</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/livros-desenvolvidos-no-ambito-do-ppac-profissional/" target="_blank">
+    <div class="side-link-title">📕 Livros do PPAC</div>
+    <div class="side-link-desc">Publicações de docentes e egressos do programa</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/politicas-de-acoes-afirmativas/" target="_blank">
+    <div class="side-link-title">🤝 Ações Afirmativas</div>
+    <div class="side-link-desc">Diretrizes de inclusão e diversidade</div>
+  </a>
+
+  <div class="side-cat">Produção Científica <span>3</span></div>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/destaques-do-corpo-docente-em-2021-2024/" target="_blank">
+    <div class="side-link-title">⭐ Destaques Docentes 2021-2024</div>
+    <div class="side-link-desc">Produção destacada dos professores no quadriênio</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/artigos-aprovados-em-eventos-periodicos/" target="_blank">
+    <div class="side-link-title">📰 Artigos Aprovados</div>
+    <div class="side-link-desc">Artigos publicados em eventos e periódicos</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/lista-de-eventos-cientificos/" target="_blank">
+    <div class="side-link-title">📢 Chamada de Trabalhos</div>
+    <div class="side-link-desc">Eventos científicos com chamadas abertas</div>
+  </a>
+
+  <div class="side-cat">Comunicação <span>4</span></div>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/category/noticias/" target="_blank">
+    <div class="side-link-title">📰 Notícias do PPAC</div>
+    <div class="side-link-desc">Últimas atualizações e avisos importantes</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/galeria-de-fotos/" target="_blank">
+    <div class="side-link-title">📸 Galeria de Fotos</div>
+    <div class="side-link-desc">Eventos, defesas e atividades do programa</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/links-uteis/" target="_blank">
+    <div class="side-link-title">🔗 Links Úteis (PPAC)</div>
+    <div class="side-link-desc">Coletânea oficial de links recomendados</div>
+  </a>
+  <a class="side-link ext" href="https://ppacprof.ufc.br/pt/contatos/" target="_blank">
+    <div class="side-link-title">📞 Contatos</div>
+    <div class="side-link-desc">Coordenação, secretaria e endereço (Benfica)</div>
+  </a>
+
+  <div class="side-foot">Portal PPAC · 29 links · ABR/2026</div>
+</aside>
+
+<script>
+function filtrarLinks(termo) {
+  termo = termo.toLowerCase();
+  document.querySelectorAll('.side-link').forEach(link => {
+    const match = link.textContent.toLowerCase().includes(termo);
+    link.style.display = match ? 'block' : 'none';
+  });
+  document.querySelectorAll('.side-cat').forEach(cat => {
+    let next = cat.nextElementSibling;
+    let hasVisible = false;
+    while (next && next.classList.contains('side-link')) {
+      if (next.style.display !== 'none') {
+        hasVisible = true;
+        break;
+      }
+      next = next.nextElementSibling;
+    }
+    cat.style.display = hasVisible ? 'flex' : 'none';
+  });
+}
 </script>
 </body>
 </html>
