@@ -58,8 +58,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 nav{position:sticky;top:0;z-index:100;background:rgba(11,22,35,0.45);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-bottom:1px solid rgba(255,255,255,0.08);padding:0 2rem;box-shadow:0 4px 30px rgba(0,0,0,0.2);}
 .nav-inner{max-width:1280px;margin:auto;display:flex;align-items:center;justify-content:space-between;height:64px;}
 .logo-box{display:flex;align-items:center;gap:15px;}
-.logo-ufc{width:40px;height:40px;background:linear-gradient(135deg,var(--blue),var(--blue3));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:14px;color:#fff;box-shadow:0 0 20px rgba(79,195,247,0.3);}
-.logo-box h1{font-size:18px;margin:0;line-height:1.2;font-weight:700;letter-spacing:-0.4px;color:#fff;}
+.logo-ufc{flex-shrink:0;width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--blue3));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:12px;color:#fff;box-shadow:0 0 20px rgba(79,195,247,0.3);}
+.logo-box h1{font-size:14px;margin:0;line-height:1.2;font-weight:700;letter-spacing:-0.4px;color:#fff;}
 .nav-links{display:flex;gap:6px;align-items:center;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;padding:6px 14px;border-radius:8px;transition:.25s;display:flex;align-items:center;gap:6px;}
 .nav-links a:hover{background:rgba(79,195,247,0.1);color:#fff;}
@@ -906,9 +906,9 @@ body.viewer-mode [onclick="openAddDisciplineModal()"] {
 .side-search input:focus { border-color: var(--blue3); }
 .side-cat { font-size: 11px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 1px; margin: 24px 0 10px; display: flex; align-items: center; justify-content: space-between; }
 .side-cat span { background: rgba(79,195,247,0.15); color: var(--blue3); padding: 2px 6px; border-radius: 4px; font-size: 9px; }
-.side-link { display: block; text-decoration: none; padding: 10px 12px; border-radius: 8px; transition: 0.2s; margin-bottom: 4px; }
-.side-link:hover { background: rgba(79,195,247,0.08); }
-.side-link-title { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.side-link { display: block; text-decoration: none; padding: 10px 12px; border-radius: 8px; transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 4px; border: 1px solid transparent; }
+.side-link:hover { background: rgba(79,195,247,0.08); transform: scale(1.03) translateX(4px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); border-color: rgba(79,195,247,0.2); z-index: 2; position: relative; }
+.side-link-title { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; transition: 0.2s; }
 .side-link:hover .side-link-title { color: var(--blue3); }
 .side-link-desc { font-size: 10px; color: var(--gray); line-height: 1.4; }
 .side-foot { margin-top: 30px; font-size: 10px; color: var(--gray); text-align: center; border-top: 1px solid var(--border); padding-top: 16px; }
@@ -936,7 +936,8 @@ body.viewer-mode [onclick="openAddDisciplineModal()"] {
 <nav id="main-nav">
   <div class="nav-inner">
     <div class="logo-box">
-      <h1>PPAC_COGERH</h1>
+      <div class="logo-ufc">UFC</div>
+      <h1>Mestrado Profissional</h1>
     </div>
     <!-- Desktop nav links -->
     <div class="nav-links">
@@ -2505,7 +2506,7 @@ async function _refreshBackupLabel() {
   if (!lbl) return;
   try {
     const h = await _idbGet(_IDB_KEY);
-    lbl.textContent = h ? `Backup → ${h.name}` : 'Backup';
+    lbl.textContent = 'Backup';
   } catch { lbl.textContent = 'Backup'; }
 }
 
@@ -2618,7 +2619,7 @@ async function resetBackupFolder() {
   try {
     const dir = await _getBackupDir(true);
     if (dir) {
-      if (lbl) lbl.textContent = `Backup → ${dir.name}`;
+      if (lbl) lbl.textContent = 'Backup';
       showToast(`✅ Pasta configurada: "${dir.name}"`, 'success');
     }
   } catch(e) { if (e.name !== 'AbortError') console.warn(e); }
@@ -3087,7 +3088,7 @@ switchModel(currentModel);
 
 <aside class="sidebar">
   <div class="side-head">
-    <h1>Portal PPAC · UFC</h1>
+    <h1>Espaço - PPAC_UFC_COGERH</h1>
     <p>Mestrado Profissional · Turma 2026.1 · COGERH</p>
   </div>
 
@@ -3095,7 +3096,7 @@ switchModel(currentModel);
     <input type="text" placeholder="🔍 Filtrar links..." oninput="filtrarLinks(this.value)">
   </div>
 
-  <div class="side-cat">Sistemas UFC <span>5</span></div>
+  <div class="side-cat">Sistemas UFC <span>6</span></div>
   <a class="side-link ext" href="http://si3.ufc.br/sigaa" target="_blank">
     <div class="side-link-title">🎓 SIGAA UFC</div>
     <div class="side-link-desc">Matrícula, notas, frequência e atestados</div>
@@ -3115,6 +3116,10 @@ switchModel(currentModel);
   <a class="side-link ext" href="http://ufc.br/" target="_blank">
     <div class="side-link-title">🏛️ Portal UFC</div>
     <div class="side-link-desc">Site institucional da Universidade</div>
+  </a>
+  <a class="side-link ext" href="https://www.cogerh.com.br" target="_blank">
+    <div class="side-link-title">💧 Portal COGERH</div>
+    <div class="side-link-desc">Companhia de Gestão dos Recursos Hídricos</div>
   </a>
 
   <div class="side-cat">Ferramentas IA <span>3</span></div>
@@ -3224,7 +3229,7 @@ switchModel(currentModel);
     <div class="side-link-desc">Coordenação, secretaria e endereço (Benfica)</div>
   </a>
 
-  <div class="side-foot">Portal PPAC · 29 links · ABR/2026</div>
+  <div class="side-foot">Portal PPAC · 30 links · ABR/2026</div>
 </aside>
 
 <script>
