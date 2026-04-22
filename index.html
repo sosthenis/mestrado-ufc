@@ -1395,7 +1395,7 @@ Sem API? Use a aba <strong>Acesso Direto →</strong></div>
     </div>
     <div class="chat-footer">
       <a onclick="configChatKey()" id="chat-key-status"><i class="fas fa-key"></i> Configurar API key</a>
-      <span id="chat-model-label" style="font-size:9px;color:var(--gray2);">Gemini 2.0 Flash</span>
+      <span id="chat-model-label" style="font-size:9px;color:var(--gray2);">gemini-1.5-flash</span>
     </div>
   </div>
 
@@ -3045,7 +3045,7 @@ async function callOpenAI(key, userText) {
       'Authorization': `Bearer ${key}`
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-nano',
       messages: [
         { role: 'system', content: CHAT_SYSTEM_PROMPT },
         ...chatHistory.slice(-20)
